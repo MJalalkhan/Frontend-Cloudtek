@@ -41,6 +41,7 @@ export default function SignIn() {
       .then((res) => {
         console.log("Success:", res);
         if (res.token) {
+          localStorage.setItem("token", res.token);
           console.log("here");
           navigate("/AllPosts", { replace: true });
         }

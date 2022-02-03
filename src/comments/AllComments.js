@@ -1,13 +1,25 @@
 import { Divider, Avatar, Grid, Paper } from "@material-ui/core";
+import { makeStyles } from "@material-ui/core/styles";
+import { useEffect } from "react";
 
 const imgLink =
   "https://images.pexels.com/photos/1681010/pexels-photo-1681010.jpeg?auto=compress&cs=tinysrgb&dpr=3&h=750&w=1260";
 
+const useStyles = makeStyles((theme) => ({
+  comments: {
+    textAlign: "-webkit-left",
+    margin: "10px 20px",
+  },
+}));
+console.log("sasas", localStorage.getItem("token"));
+
 export const AllComments = () => {
+  const classes = useStyles();
+
   return (
-    <div style={{ padding: 14 }} className="App">
-      <h1>Comments</h1>
-      <Paper style={{ padding: "40px 20px" }}>
+    <div className="App">
+      <h3 className={classes.comments}>Comments</h3>
+      <Paper style={{ padding: "10px 20px" }}>
         <Grid container wrap="nowrap" spacing={2}>
           <Grid item>
             <Avatar alt="Remy Sharp" src={imgLink} />
@@ -16,15 +28,14 @@ export const AllComments = () => {
             <h4 style={{ margin: 0, textAlign: "left" }}>Michel Michel</h4>
             <p style={{ textAlign: "left" }}>
               Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aenean
-              luctus ut est sed faucibus. Duis bibendum ac ex vehicula laoreet.
-              Suspendisse congue vulputate lobortis.{" "}
+              luctus ut est sed faucibus.{" "}
             </p>
             <p style={{ textAlign: "left", color: "gray" }}>
               posted 1 minute ago
             </p>
           </Grid>
         </Grid>
-        <Divider variant="fullWidth" style={{ margin: "30px 0" }} />
+        <Divider variant="fullWidth" style={{ margin: "10px 0" }} />
       </Paper>
     </div>
   );
