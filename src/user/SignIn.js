@@ -42,6 +42,7 @@ export default function SignIn() {
         console.log("Success:", res);
         if (res.token) {
           localStorage.setItem("token", res.token);
+          localStorage.setItem("userId", res.id);
           console.log("here");
           navigate("/AllPosts", { replace: true });
         }

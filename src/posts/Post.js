@@ -1,8 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { makeStyles } from "@material-ui/core/styles";
 import {
-  AppBar,
-  Toolbar,
   Typography,
   Box,
   Container,
@@ -10,20 +8,22 @@ import {
   Card,
   CardActionArea,
   CardActions,
-  CardMedia,
   CardContent,
   Avatar,
   Divider,
 } from "@material-ui/core";
-
-import { IconButton, InputAdornment, TextField } from "@mui/material";
+import CreateIcon from "@mui/icons-material/Create";
+import { IconButton, InputAdornment, TextField, Button } from "@mui/material";
 import { Link } from "react-router-dom";
-import { AllComments } from "../comments/AllComments";
+import { RecentComments } from "../comments/recentComments";
 import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
+import Header from "../Comps/Header";
+
 const useStyles = makeStyles((theme) => ({
   appBar: {
     backgroundColor: "#fff",
   },
+  Link: { textDecoration: "none", color: "black" },
   hero: {
     backgroundImage: `linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url('https://images.unsplash.com/photo-1558981852-426c6c22a060?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&w=1000&q=80')`,
     height: "500px",
@@ -68,9 +68,51 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-export const Posts = () => {
+export const Posts = (props) => {
   const classes = useStyles();
   const [data, setData] = useState([]);
+
+  const handleSubmit = (event) => {
+    event.preventDefault();
+    const data = new FormData(event.currentTarget);
+    let obj = {
+      user: localStorage.getItem("userId"),
+      title: data.get("title"),
+      description: data.get("description"),
+      category: data.get("category"),
+    };
+    console.log("data obj ", obj);
+    fetch("https://taskforum.herokuapp.com/api/post/", {
+      method: "POST", // or 'PUT'
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: "Bearer " + localStorage.getItem("token"),
+      },
+      body: JSON.stringify(obj),
+    })
+      .then((response) => response.json())
+      .then((res) => {
+        console.log("Post Added:", res);
+      })
+      .catch((error) => {
+        console.error("Error:", error);
+      });
+  };
+
+  const handleDelete = (item) => {
+    console.log(item);
+
+    fetch(`https://taskforum.herokuapp.com/api/post/${item._id}`, {
+      method: "DELETE",
+      headers: {
+        "content-type": "application/json",
+        Authorization: "Bearer " + localStorage.getItem("token"),
+      },
+    })
+      .then((res) => res.json()) // or res.json()
+      .then((res) => console.log(res))
+      .catch((err) => console.log(err));
+  };
   useEffect(() => {
     fetch("https://taskforum.herokuapp.com/api/post/", {
       method: "Get",
@@ -83,30 +125,85 @@ export const Posts = () => {
       .then((res) => {
         setData(res.data);
         console.log("Success:", res);
-        if (res.token) {
-          // localStorage.setItem("token", res.token);
-          console.log("here");
-          // navigate("/AllPosts", { replace: true });
-        }
+
         return;
       })
       .catch((error) => {
         console.error("Error:", error);
       });
-  }, []);
+  }, [Posts]);
   return (
     <div className="App">
-      <AppBar className={classes.appBar} position="static">
-        <Toolbar>
-          <Typography variant="h6" color="primary">
-            Posts
-          </Typography>
-        </Toolbar>
-      </AppBar>
+      <Header />
+
       <Box className={classes.hero}>
         <Box>React Posts</Box>
       </Box>
       <Container maxWidth="lg" className={classes.blogsContainer}>
+        <Box
+          sx={{
+            marginTop: 8,
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+          }}
+        >
+          <Avatar sx={{ m: 1, bgcolor: "secondary.main" }}>
+            <CreateIcon />
+          </Avatar>
+          <Typography component="h1" variant="h5">
+            Add new post
+          </Typography>
+          <Box
+            component="form"
+            noValidate
+            onSubmit={handleSubmit}
+            sx={{ mt: 3 }}
+          >
+            <Grid container spacing={2}>
+              <Grid item xs={6}>
+                <TextField
+                  autoComplete="given-name"
+                  name="title"
+                  required
+                  fullWidth
+                  id="title"
+                  label="Title"
+                  autoFocus
+                />
+              </Grid>
+              <Grid item xs={6}>
+                <TextField
+                  autoComplete="given-name"
+                  name="category"
+                  // required
+                  fullWidth
+                  id="category"
+                  label="Category"
+                  autoFocus
+                />
+              </Grid>
+              <Grid item xs={12}>
+                <TextField
+                  // required
+                  fullWidth
+                  id="description"
+                  label="Description"
+                  name="description"
+                  autoComplete="given-name"
+                />
+              </Grid>
+            </Grid>
+            <Button
+              type="submit"
+              fullWidth
+              variant="contained"
+              sx={{ mt: 3, mb: 2 }}
+            >
+              Post
+            </Button>
+          </Box>
+        </Box>
         <Typography variant="h4" className={classes.blogTitle}>
           Posts
         </Typography>
@@ -115,24 +212,30 @@ export const Posts = () => {
             var dt = new Date(post.user.created_at);
             // console.log();
             return (
-              <Grid item xs={12}>
-                {console.log(post._id)}
-                <Link
-                  style={{ textDecoration: "none" }}
-                  to={`SinglePost/${post._id}`}
-                >
+              <Grid item xs={12} key={index} style={{ margin: "10px" }}>
+                {post.user._id === localStorage.getItem("userId") && (
+                  // return(
+                  <>
+                    <Button variant="outlined" size="small">
+                      Edit
+                    </Button>
+                    <Button
+                      variant="outlined"
+                      size="small"
+                      onClick={() => handleDelete(post)}
+                    >
+                      Delete{" "}
+                    </Button>
+                  </>
+                )}
+                <Link className={classes.Link} to={`/SinglePost/${post._id}`}>
                   <Card className={classes.card}>
                     <CardActionArea>
-                      {/* <CardMedia
-                      className={classes.media}
-                      image="https://images.pexels.com/photos/2004161/pexels-photo-2004161.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=750&w=1260"
-                      title="Contemplative Reptile"
-                    /> */}
                       <CardContent>
                         <Typography gutterBottom variant="h5" component="h2">
                           {post.title}
                         </Typography>
-                        <Typography gutterBottom variant="p" component="p">
+                        <Typography gutterBottom variant="h6" component="h6">
                           Category: {post.category}
                         </Typography>
                         <Typography
@@ -144,12 +247,13 @@ export const Posts = () => {
                         </Typography>
                       </CardContent>
                     </CardActionArea>
+
                     <CardActions className={classes.cardActions}>
                       <Box className={classes.author}>
                         <Avatar src="https://images.pexels.com/photos/220453/pexels-photo-220453.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=750&w=1260" />
                         <Box ml={2}>
                           <Typography variant="subtitle2" component="p">
-                            {post.user.name}
+                            Author: <strong>{post.user.name}</strong>
                           </Typography>
                           <Typography
                             variant="subtitle2"
@@ -161,28 +265,40 @@ export const Posts = () => {
                         </Box>
                       </Box>
                     </CardActions>
-                    <Divider variant="fullWidth" style={{ margin: "5px 0" }} />
-
-                    <AllComments />
-                    {/* <Link href="#" underline="hover">
-                      {"View more comments"}
-                    </Link> */}
-                    <TextField
-                      fullWidth
-                      label="Write Comment"
-                      id="fullWidth"
-                      InputProps={{
-                        endAdornment: (
-                          <InputAdornment position="end">
-                            <IconButton edge="end" color="primary">
-                              <ArrowForwardIosIcon />
-                            </IconButton>
-                          </InputAdornment>
-                        ),
-                      }}
-                    />
                   </Card>
                 </Link>
+
+                <RecentComments />
+
+                <TextField
+                  fullWidth
+                  label="Write Comment"
+                  id="fullWidth"
+                  onChange={(e) => {
+                    props.setComment(e.target.value);
+                    console.log(e.target.value);
+                  }}
+                  InputProps={{
+                    endAdornment: (
+                      <InputAdornment position="end">
+                        <IconButton
+                          edge="end"
+                          color="primary"
+                          onClick={() =>
+                            props.postComment(
+                              props.comment,
+                              post._id,
+                              post.user._id
+                            )
+                          }
+                        >
+                          <ArrowForwardIosIcon />
+                        </IconButton>
+                      </InputAdornment>
+                    ),
+                  }}
+                />
+                <Divider variant="fullWidth" style={{ marginTop: "20px" }} />
               </Grid>
             );
           })}

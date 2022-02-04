@@ -10,20 +10,23 @@ import {
   Card,
   CardActionArea,
   CardActions,
-  CardMedia,
   CardContent,
   Avatar,
   Divider,
 } from "@material-ui/core";
 
-import { IconButton, InputAdornment, Link, TextField } from "@mui/material";
-import { AllComments } from "../comments/AllComments";
+import { IconButton, InputAdornment, TextField } from "@mui/material";
 import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
+import { RecentComments } from "../comments/recentComments";
 import { useParams } from "react-router-dom";
+import { Link } from "react-router-dom";
+import Header from "../Comps/Header";
 const useStyles = makeStyles((theme) => ({
   appBar: {
     backgroundColor: "#fff",
   },
+  Link: { textDecoration: "none", color: "black" },
+
   hero: {
     backgroundImage: `linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url('https://images.unsplash.com/photo-1558981852-426c6c22a060?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&w=1000&q=80')`,
     height: "500px",
@@ -68,10 +71,12 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-export const SinglePost = () => {
+export const SinglePost = (props) => {
   const classes = useStyles();
-  const { id } = useParams();
+  let { id } = useParams();
   const [data, setData] = useState([]);
+  var dt;
+
   useEffect(() => {
     fetch(`https://taskforum.herokuapp.com/api/post/${id}`, {
       method: "Get",
@@ -83,8 +88,9 @@ export const SinglePost = () => {
       .then((response) => response.json())
       .then((res) => {
         setData(res.data);
-        console.log("Success:", res);
+        console.log("Single Post :", res);
         if (res.token) {
+          dt = new Date(data.user.created_at);
           // localStorage.setItem("token", res.token);
           console.log("here");
           // navigate("/AllPosts", { replace: true });
@@ -95,15 +101,10 @@ export const SinglePost = () => {
         console.error("Error:", error);
       });
   }, []);
+
   return (
     <div className="App">
-      <AppBar className={classes.appBar} position="static">
-        <Toolbar>
-          <Typography variant="h6" color="primary">
-            Posts
-          </Typography>
-        </Toolbar>
-      </AppBar>
+      <Header />
       <Box className={classes.hero}>
         <Box>React Posts</Box>
       </Box>
@@ -112,77 +113,82 @@ export const SinglePost = () => {
           Posts
         </Typography>
         <Grid container spacing={3}>
-          {data.map((post, index) => {
-            var dt = new Date(post.user.created_at);
-            // console.log();
-            return (
-              <Grid item xs={12}>
-                <Link to={``}>
-                  <Card className={classes.card}>
-                    <CardActionArea>
-                      {/* <CardMedia
-                      className={classes.media}
-                      image="https://images.pexels.com/photos/2004161/pexels-photo-2004161.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=750&w=1260"
-                      title="Contemplative Reptile"
-                    /> */}
-                      <CardContent>
-                        <Typography gutterBottom variant="h5" component="h2">
-                          {post.title}
-                        </Typography>
-                        <Typography gutterBottom variant="p" component="p">
-                          Category: {post.category}
-                        </Typography>
-                        <Typography
-                          variant="body2"
-                          color="textSecondary"
-                          component="p"
-                        >
-                          {post.description}
-                        </Typography>
-                      </CardContent>
-                    </CardActionArea>
-                    <CardActions className={classes.cardActions}>
-                      <Box className={classes.author}>
-                        <Avatar src="https://images.pexels.com/photos/220453/pexels-photo-220453.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=750&w=1260" />
-                        <Box ml={2}>
-                          <Typography variant="subtitle2" component="p">
-                            {post.user.name}
-                          </Typography>
-                          <Typography
-                            variant="subtitle2"
-                            color="textSecondary"
-                            component="p"
-                          >
-                            {dt.toLocaleString()}
-                          </Typography>
-                        </Box>
-                      </Box>
-                    </CardActions>
-                    <Divider variant="fullWidth" style={{ margin: "5px 0" }} />
+          <Grid item xs={12}>
+            <Card className={classes.card}>
+              <CardActionArea>
+                <CardContent>
+                  <Typography gutterBottom variant="h5" component="h2">
+                    {data.title}
+                  </Typography>
+                  <Typography gutterBottom variant="h6" component="h6">
+                    Category: {data.category}
+                  </Typography>
+                  <Typography
+                    variant="body2"
+                    color="textSecondary"
+                    component="p"
+                  >
+                    {data.description}
+                  </Typography>
+                </CardContent>
+              </CardActionArea>
+              <CardActions className={classes.cardActions}>
+                <Box className={classes.author}>
+                  <Avatar src="https://images.pexels.com/photos/220453/pexels-photo-220453.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=750&w=1260" />
+                  <Box ml={2}>
+                    <Typography variant="subtitle2" component="p">
+                      {/* {data.user.name} */}
+                    </Typography>
+                    <Typography
+                      variant="subtitle2"
+                      color="textSecondary"
+                      component="p"
+                    >
+                      {/* {dt.toLocaleString()} */}
+                    </Typography>
+                  </Box>
+                </Box>
+              </CardActions>
+              <Divider variant="fullWidth" style={{ margin: "5px 0" }} />
 
-                    <AllComments />
-                    <Link href="#" underline="hover">
-                      {"View more comments"}
-                    </Link>
-                    <TextField
-                      fullWidth
-                      label="Write Comment"
-                      id="fullWidth"
-                      InputProps={{
-                        endAdornment: (
-                          <InputAdornment position="end">
-                            <IconButton edge="end" color="primary">
-                              <ArrowForwardIosIcon />
-                            </IconButton>
-                          </InputAdornment>
-                        ),
-                      }}
-                    />
-                  </Card>
-                </Link>
-              </Grid>
-            );
-          })}
+              <RecentComments />
+              <Link
+                to="/AllComments"
+                className={classes.Link}
+                underline="hover"
+              >
+                {"View more comments"}
+              </Link>
+              <TextField
+                fullWidth
+                label="Write Comment"
+                id="fullWidth"
+                onChange={(e) => {
+                  props.setComment(e.target.value);
+                  console.log(e.target.value);
+                }}
+                InputProps={{
+                  endAdornment: (
+                    <InputAdornment position="end">
+                      <IconButton
+                        edge="end"
+                        color="primary"
+                        onClick={() =>
+                          props.postComment(
+                            props.comment,
+                            data._id,
+                            data.user._id
+                          )
+                        }
+                      >
+                        <ArrowForwardIosIcon />
+                      </IconButton>
+                    </InputAdornment>
+                  ),
+                }}
+              />
+            </Card>
+          </Grid>
         </Grid>
         <Box my={4} className={classes.paginationContainer}>
           {/* <Pagination count={10} /> */}

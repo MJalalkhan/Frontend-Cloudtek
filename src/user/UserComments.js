@@ -15,11 +15,11 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-export const AllComments = () => {
+export const UserComments = () => {
   const classes = useStyles();
   const [allComments, setAllComments] = useState([]);
   useEffect(() => {
-    fetch(`https://taskforum.herokuapp.com/api/comment/`, {
+    fetch(`https://taskforum.herokuapp.com/api/comment/user/:user_id`, {
       method: "Get",
       headers: {
         "content-type": "application/json",
