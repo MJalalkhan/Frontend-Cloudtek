@@ -120,6 +120,19 @@ export const Posts = (props) => {
       })
       .catch((err) => console.log(err));
   };
+  const handleEditPost = (post) => {
+    console.log("post Details :", post);
+    //  fetch(`https://taskforum.herokuapp.com/api/post/${id}`, {
+    //    method: "PUT",
+    //    headers: {
+    //      "content-type": "application/json",
+    //      Authorization: "Bearer " + localStorage.getItem("token"),
+    //    },
+    //  })
+    //    .then((res) => res.json()) // or res.json()
+    //    .then((res) => console.log(res))
+    //    .catch((err) => console.log(err));
+  };
   useEffect(
     () => {
       fetch("https://taskforum.herokuapp.com/api/post/", {
@@ -226,7 +239,11 @@ export const Posts = (props) => {
                 {post.user._id === localStorage.getItem("userId") && (
                   // return(
                   <>
-                    <Button variant="outlined" size="small">
+                    <Button
+                      variant="outlined"
+                      size="small"
+                      onClick={() => handleEditPost(post)}
+                    >
                       Edit
                     </Button>
                     <Button

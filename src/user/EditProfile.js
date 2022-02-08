@@ -32,6 +32,7 @@ export default function EditProfile() {
       .then((response) => response.json())
       .then((res) => {
         setProfile(res.data);
+        setName(res.data.name);
         console.log("Profile:", res);
 
         return;
@@ -42,29 +43,27 @@ export default function EditProfile() {
   }, []);
 
   const handleSubmit = (event) => {
-    // event.preventDefault();
-    // const data = new FormData(event.currentTarget);
-    // // eslint-disable-next-line no-console
-    // let obj = {
-    //   name: data.get("name"),
-    //   email: data.get("email"),
-    //   password: data.get("password"),
-    // };
-    // console.log("data obj ", obj);
-    // fetch("https://taskforum.herokuapp.com/api/auth/signup", {
-    //   method: "POST", // or 'PUT'
-    //   headers: {
-    //     "Content-Type": "application/json",
-    //   },
-    //   body: JSON.stringify(obj),
-    // })
-    //   .then((response) => response.json())
-    //   .then((res) => {
-    //     console.log("Success:", res);
-    //   })
-    //   .catch((error) => {
-    //     console.error("Error:", error);
-    //   });
+    event.preventDefault();
+    const data = new FormData(event.currentTarget);
+    let obj = {
+      name: data.get("name"),
+    };
+    console.log("data obj ", obj);
+    fetch(`https://taskforum.herokuapp.com/api/users/${userId}`, {
+      method: "PUT", // or 'PUT'
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: "Bearer " + localStorage.getItem("token"),
+      },
+      body: JSON.stringify(obj),
+    })
+      .then((response) => response.json())
+      .then((res) => {
+        console.log("Success:", res);
+      })
+      .catch((error) => {
+        console.error("Error:", error);
+      });
   };
 
   return (
@@ -93,14 +92,15 @@ export default function EditProfile() {
                 name="name"
                 required
                 fullWidth
-                value={profile.name}
+                value={name}
                 onChange={(e) => {
+                  setName(profile.name);
                   setName(e.target.value);
                   console.log(e.target.value);
                 }}
                 id="name"
                 label="Name"
-                autoFocus
+                // focused="none"
               />
             </Grid>
             <Grid item xs={6}>

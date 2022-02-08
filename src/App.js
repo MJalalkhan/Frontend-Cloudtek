@@ -48,13 +48,12 @@ function App() {
     <div className="App">
       <BrowserRouter>
         <Routes>
-          {/* <Route path="/Header" element={<Header />} /> */}
+          {/* USER */}
           <Route path="/" element={<SignIn />} />
           <Route path="signUp" element={<SignUp />} />
           <Route path="editProfile" element={<EditProfile />} />
-          <Route path="recentComments" element={<RecentComments />} />
-          <Route path="/AllComments/:postId" element={<AllComments />} />
-          <Route path="/userComments/:id" element={<UserComments />} />
+
+          {/* POSTS */}
           <Route
             exact
             path="AllPosts"
@@ -77,6 +76,11 @@ function App() {
               />
             }
           />
+
+          {/* COMMENTS */}
+          <Route path="recentComments" element={<RecentComments />} />
+          <Route path="/AllComments/:postId" element={<AllComments />} />
+          <Route path="/userComments/:id" element={<UserComments />} />
         </Routes>
       </BrowserRouter>
     </div>

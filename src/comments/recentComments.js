@@ -20,8 +20,6 @@ export const RecentComments = ({ postId }) => {
   const classes = useStyles();
   const [comments, setComments] = useState([]);
   const handleDelete = (id) => {
-    // console.log(item);
-
     fetch(`https://taskforum.herokuapp.com/api/comment/${id}`, {
       method: "DELETE",
       headers: {
@@ -32,6 +30,19 @@ export const RecentComments = ({ postId }) => {
       .then((res) => res.json()) // or res.json()
       .then((res) => console.log(res))
       .catch((err) => console.log(err));
+  };
+  const handleCommentEdit = (id) => {
+    console.log("comment id :", id);
+    //  fetch(`https://taskforum.herokuapp.com/api/comment/${id}`, {
+    //    method: "PUT",
+    //    headers: {
+    //      "content-type": "application/json",
+    //      Authorization: "Bearer " + localStorage.getItem("token"),
+    //    },
+    //  })
+    //    .then((res) => res.json()) // or res.json()
+    //    .then((res) => console.log(res))
+    //    .catch((err) => console.log(err));
   };
 
   useEffect(() => {
@@ -69,12 +80,11 @@ export const RecentComments = ({ postId }) => {
                   <div key={index}>
                     {x.user && x.user._id === localStorage.getItem("userId") && (
                       <>
-                        {console.log(
-                          x.user._id,
-                          " matched ",
-                          localStorage.getItem("userId")
-                        )}
-                        <Button variant="outlined" size="small">
+                        <Button
+                          variant="outlined"
+                          size="small"
+                          onClick={() => handleCommentEdit(x._id)}
+                        >
                           Edit
                         </Button>
                         <Button
