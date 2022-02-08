@@ -7,7 +7,6 @@ import { SinglePost } from "./posts/SinglePost";
 import { useState } from "react";
 import { RecentComments } from "./comments/recentComments";
 import { AllComments } from "./comments/AllComments";
-import Header from "./Comps/Header";
 import EditProfile from "./user/EditProfile";
 import { UserComments } from "./user/UserComments";
 function App() {
@@ -15,15 +14,15 @@ function App() {
 
   const postComment = (msg, post, user) => {
     if (!msg == "") {
-      console.log("heererer", msg);
-      // console.log(details, "asaas");
-      console.log(user);
-      console.log(post);
+      console.log("Comment = ", msg);
+
       let obj = {
-        user: user,
         comment: msg,
         post: post,
+        user: user,
       };
+
+      console.log("user+comment+post = ", obj);
 
       fetch("https://taskforum.herokuapp.com/api/comment/", {
         method: "POST", // or 'PUT'
@@ -54,7 +53,7 @@ function App() {
           <Route path="signUp" element={<SignUp />} />
           <Route path="editProfile" element={<EditProfile />} />
           <Route path="recentComments" element={<RecentComments />} />
-          <Route path="/AllComments" element={<AllComments />} />
+          <Route path="/AllComments/:postId" element={<AllComments />} />
           <Route path="/userComments/:id" element={<UserComments />} />
           <Route
             exact

@@ -72,7 +72,7 @@ export const Posts = (props) => {
   const classes = useStyles();
   const [data, setData] = useState([]);
 
-  const handleSubmit = (event) => {
+  const handleAddPost = (event) => {
     event.preventDefault();
     const data = new FormData(event.currentTarget);
     let obj = {
@@ -93,13 +93,14 @@ export const Posts = (props) => {
       .then((response) => response.json())
       .then((res) => {
         console.log("Post Added:", res);
+        setData([...data, res.data]);
       })
       .catch((error) => {
         console.error("Error:", error);
       });
   };
 
-  const handleDelete = (item) => {
+  const handleDeletePost = (item) => {
     console.log(item);
 
     fetch(`https://taskforum.herokuapp.com/api/post/${item._id}`, {
@@ -110,28 +111,38 @@ export const Posts = (props) => {
       },
     })
       .then((res) => res.json()) // or res.json()
-      .then((res) => console.log(res))
+      .then((res) => {
+        console.log(res);
+        let result = data.map((x, index) => {
+          return x.id !== item._id;
+        });
+        setData(result);
+      })
       .catch((err) => console.log(err));
   };
-  useEffect(() => {
-    fetch("https://taskforum.herokuapp.com/api/post/", {
-      method: "Get",
-      headers: {
-        "content-type": "application/json",
-        Authorization: "Bearer " + localStorage.getItem("token"),
-      },
-    })
-      .then((response) => response.json())
-      .then((res) => {
-        setData(res.data);
-        console.log("Success:", res);
-
-        return;
+  useEffect(
+    () => {
+      fetch("https://taskforum.herokuapp.com/api/post/", {
+        method: "Get",
+        headers: {
+          "content-type": "application/json",
+          Authorization: "Bearer " + localStorage.getItem("token"),
+        },
       })
-      .catch((error) => {
-        console.error("Error:", error);
-      });
-  }, [Posts]);
+        .then((response) => response.json())
+        .then((res) => {
+          setData(res.data);
+          console.log("All Posts:", res);
+
+          return;
+        })
+        .catch((error) => {
+          console.error("Error:", error);
+        });
+    },
+    [],
+    [data]
+  );
   return (
     <div className="App">
       <Header />
@@ -157,7 +168,7 @@ export const Posts = (props) => {
           <Box
             component="form"
             noValidate
-            onSubmit={handleSubmit}
+            onSubmit={handleAddPost}
             sx={{ mt: 3 }}
           >
             <Grid container spacing={2}>
@@ -210,7 +221,6 @@ export const Posts = (props) => {
         <Grid container spacing={3}>
           {data.map((post, index) => {
             var dt = new Date(post.user.created_at);
-            // console.log();
             return (
               <Grid item xs={12} key={index} style={{ margin: "10px" }}>
                 {post.user._id === localStorage.getItem("userId") && (
@@ -222,7 +232,7 @@ export const Posts = (props) => {
                     <Button
                       variant="outlined"
                       size="small"
-                      onClick={() => handleDelete(post)}
+                      onClick={() => handleDeletePost(post)}
                     >
                       Delete{" "}
                     </Button>
@@ -267,8 +277,15 @@ export const Posts = (props) => {
                     </CardActions>
                   </Card>
                 </Link>
-
-                <RecentComments />
+                {/* {console.log(post._id, "post")} */}
+                <RecentComments postId={post._id} />
+                <Link
+                  to={`/AllComments/${post._id}`}
+                  className={classes.Link}
+                  underline="hover"
+                >
+                  {"View more comments"}
+                </Link>
 
                 <TextField
                   fullWidth
@@ -288,7 +305,7 @@ export const Posts = (props) => {
                             props.postComment(
                               props.comment,
                               post._id,
-                              post.user._id
+                              localStorage.getItem("userId")
                             )
                           }
                         >

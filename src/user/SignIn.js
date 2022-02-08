@@ -19,17 +19,16 @@ const theme = createTheme();
 export default function SignIn() {
   let navigate = useNavigate();
 
-  const handleSubmit = (event) => {
+  const handleSignIn = (event) => {
     event.preventDefault();
     const data = new FormData(event.currentTarget);
-    console.log("data===", data);
     // eslint-disable-next-line no-console
     let obj = {
       email: data.get("email"),
       password: data.get("password"),
     };
 
-    console.log("data obj ", obj);
+    console.log("user credentials= ", obj);
     fetch("https://taskforum.herokuapp.com/api/auth/signin", {
       method: "POST", // or 'PUT'
       headers: {
@@ -39,11 +38,11 @@ export default function SignIn() {
     })
       .then((response) => response.json())
       .then((res) => {
-        console.log("Success:", res);
+        console.log("SignedIn :", res);
         if (res.token) {
           localStorage.setItem("token", res.token);
           localStorage.setItem("userId", res.id);
-          console.log("here");
+
           navigate("/AllPosts", { replace: true });
         }
         return;
@@ -73,7 +72,7 @@ export default function SignIn() {
           </Typography>
           <Box
             component="form"
-            onSubmit={handleSubmit}
+            onSubmit={handleSignIn}
             noValidate
             sx={{ mt: 1 }}
           >

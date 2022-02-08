@@ -4,25 +4,25 @@ import Box from "@mui/material/Box";
 import Toolbar from "@mui/material/Toolbar";
 import Typography from "@mui/material/Typography";
 import IconButton from "@mui/material/IconButton";
-import MenuIcon from "@mui/icons-material/Menu";
 import AccountCircle from "@mui/icons-material/AccountCircle";
-import Switch from "@mui/material/Switch";
-import FormControlLabel from "@mui/material/FormControlLabel";
-import FormGroup from "@mui/material/FormGroup";
+
 import MenuItem from "@mui/material/MenuItem";
 import Menu from "@mui/material/Menu";
 import { Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 export default function Header() {
   //   console.log("props", props.user);
+  let navigate = useNavigate();
+
   const [auth, setAuth] = React.useState(true);
   const [anchorEl, setAnchorEl] = React.useState(null);
 
   const handleLogout = (event) => {
-    event.view.sessionStorage.removeItem("token");
-    if (event.view.sessionStorage.token == undefined) {
+    localStorage.clear();
+    if (localStorage.getItem("token") == undefined) {
       console.log("Logout done");
-      //   history.push("/");
+      navigate("/", { replace: true });
     }
   };
 

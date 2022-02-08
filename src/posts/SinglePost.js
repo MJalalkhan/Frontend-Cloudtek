@@ -1,8 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { makeStyles } from "@material-ui/core/styles";
 import {
-  AppBar,
-  Toolbar,
   Typography,
   Box,
   Container,
@@ -75,7 +73,6 @@ export const SinglePost = (props) => {
   const classes = useStyles();
   let { id } = useParams();
   const [data, setData] = useState([]);
-  var dt;
 
   useEffect(() => {
     fetch(`https://taskforum.herokuapp.com/api/post/${id}`, {
@@ -90,10 +87,7 @@ export const SinglePost = (props) => {
         setData(res.data);
         console.log("Single Post :", res);
         if (res.token) {
-          dt = new Date(data.user.created_at);
-          // localStorage.setItem("token", res.token);
-          console.log("here");
-          // navigate("/AllPosts", { replace: true });
+          var dt = new Date(data.user.created_at);
         }
         return;
       })
@@ -150,10 +144,10 @@ export const SinglePost = (props) => {
                 </Box>
               </CardActions>
               <Divider variant="fullWidth" style={{ margin: "5px 0" }} />
+              {data.length !== 0 ? <RecentComments postId={data._id} /> : ""}
 
-              <RecentComments />
               <Link
-                to="/AllComments"
+                to={`/AllComments/${data._id}`}
                 className={classes.Link}
                 underline="hover"
               >

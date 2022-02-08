@@ -1,8 +1,8 @@
 import { Divider, Avatar, Grid, Paper, Container } from "@material-ui/core";
 import { makeStyles } from "@material-ui/core/styles";
-import { AppBar, Toolbar, Typography } from "@mui/material";
+import { AppBar, Button, Toolbar, Typography } from "@mui/material";
 import { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import Header from "../Comps/Header";
 
 const imgLink =
@@ -17,9 +17,24 @@ const useStyles = makeStyles((theme) => ({
 
 export const AllComments = () => {
   const classes = useStyles();
+  const { postId } = useParams();
   const [allComments, setAllComments] = useState([]);
+  const handleDelete = (id, com) => {
+    console.log(com, "asasasas");
+
+    fetch(`https://taskforum.herokuapp.com/api/comment/${id}`, {
+      method: "DELETE",
+      headers: {
+        "content-type": "application/json",
+        Authorization: "Bearer " + localStorage.getItem("token"),
+      },
+    })
+      .then((res) => res.json()) // or res.json()
+      .then((res) => console.log(res))
+      .catch((err) => console.log(err));
+  };
   useEffect(() => {
-    fetch(`https://taskforum.herokuapp.com/api/comment/`, {
+    fetch(`https://taskforum.herokuapp.com/api/comment/post/${postId}`, {
       method: "Get",
       headers: {
         "content-type": "application/json",
@@ -28,7 +43,7 @@ export const AllComments = () => {
     })
       .then((response) => response.json())
       .then((res) => {
-        console.log("All comments :", res);
+        console.log("All comments of this post :", res);
         setAllComments(res.data);
         if (res.token) {
           console.log("here");
@@ -46,29 +61,48 @@ export const AllComments = () => {
       <Container maxWidth="sm">
         <h3 className={classes.comments}>Comments</h3>
         <Paper style={{ padding: "10px 20px" }}>
-          {allComments.map((com, index) => {
-            var dt = new Date(com.user.created_at);
-            return (
-              <>
-                <Grid container wrap="nowrap" spacing={2} key={index}>
-                  {console.log(com)}
-                  <Grid item>
-                    <Avatar alt="Remy Sharp" src={imgLink} />
+          {allComments.length !== 0 ? (
+            allComments.map((com, index) => {
+              var dt = new Date(com.user.created_at);
+              return (
+                <div key={index}>
+                  {com.user._id === localStorage.getItem("userId") && (
+                    // return(
+                    <>
+                      <Button variant="outlined" size="small">
+                        Edit
+                      </Button>
+                      <Button
+                        variant="outlined"
+                        size="small"
+                        onClick={() => handleDelete(com._id, com)}
+                      >
+                        Delete{" "}
+                      </Button>
+                    </>
+                  )}
+                  <Grid container wrap="nowrap" spacing={2} key={index}>
+                    {console.log(com)}
+                    <Grid item>
+                      <Avatar alt="Remy Sharp" src={imgLink} />
+                    </Grid>
+                    <Grid item xs zeroMinWidth>
+                      <h4 style={{ margin: 0, textAlign: "left" }}>
+                        {com.user.name}
+                      </h4>
+                      <p style={{ textAlign: "left" }}>{com.comment}</p>
+                      <p style={{ textAlign: "left", color: "gray" }}>
+                        {dt.toLocaleString()}
+                      </p>
+                    </Grid>
                   </Grid>
-                  <Grid item xs zeroMinWidth>
-                    <h4 style={{ margin: 0, textAlign: "left" }}>
-                      {com.user.name}
-                    </h4>
-                    <p style={{ textAlign: "left" }}>{com.comment}</p>
-                    <p style={{ textAlign: "left", color: "gray" }}>
-                      {dt.toLocaleString()}
-                    </p>
-                  </Grid>
-                </Grid>
-                <Divider variant="fullWidth" style={{ margin: "10px 0" }} />
-              </>
-            );
-          })}
+                  <Divider variant="fullWidth" style={{ margin: "10px 0" }} />
+                </div>
+              );
+            })
+          ) : (
+            <h6>Loading...</h6>
+          )}
         </Paper>
       </Container>
     </div>

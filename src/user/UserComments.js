@@ -1,8 +1,6 @@
 import { Divider, Avatar, Grid, Paper, Container } from "@material-ui/core";
 import { makeStyles } from "@material-ui/core/styles";
-import { AppBar, Toolbar, Typography } from "@mui/material";
 import { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
 import Header from "../Comps/Header";
 
 const imgLink =
@@ -51,7 +49,7 @@ export const UserComments = () => {
             return (
               <>
                 <Grid container wrap="nowrap" spacing={2} key={index}>
-                  {console.log(com)}
+                  {console.log(com, "commmm")}
                   <Grid item>
                     <Avatar alt="Remy Sharp" src={imgLink} />
                   </Grid>
