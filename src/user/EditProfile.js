@@ -21,6 +21,7 @@ export default function EditProfile() {
   const [name, setName] = useState([]);
 
   let userId = localStorage.getItem("userId");
+  //Get One User
   useEffect(() => {
     fetch(`https://taskforum.herokuapp.com/api/users/${userId}`, {
       method: "Get",
@@ -31,7 +32,6 @@ export default function EditProfile() {
     })
       .then((response) => response.json())
       .then((res) => {
-        setProfile(res.data);
         setName(res.data.name);
         console.log("Profile:", res);
 
@@ -42,6 +42,7 @@ export default function EditProfile() {
       });
   }, []);
 
+  //Update User Name
   const handleSubmit = (event) => {
     event.preventDefault();
     const data = new FormData(event.currentTarget);
@@ -94,7 +95,7 @@ export default function EditProfile() {
                 fullWidth
                 value={name}
                 onChange={(e) => {
-                  setName(profile.name);
+                  // setName(profile.name);
                   setName(e.target.value);
                   console.log(e.target.value);
                 }}
@@ -107,7 +108,6 @@ export default function EditProfile() {
               <TextField
                 autoComplete="given-name"
                 name="id"
-                // required
                 value={profile._id}
                 fullWidth
                 id="id"
@@ -117,7 +117,6 @@ export default function EditProfile() {
             </Grid>
             <Grid item xs={12}>
               <TextField
-                // required
                 fullWidth
                 id="email"
                 value={profile.email}

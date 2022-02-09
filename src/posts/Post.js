@@ -71,7 +71,7 @@ const useStyles = makeStyles((theme) => ({
 export const Posts = (props) => {
   const classes = useStyles();
   const [data, setData] = useState([]);
-
+//Create Post
   const handleAddPost = (event) => {
     event.preventDefault();
     const data = new FormData(event.currentTarget);
@@ -99,10 +99,8 @@ export const Posts = (props) => {
         console.error("Error:", error);
       });
   };
-
+//Delete Post
   const handleDeletePost = (item) => {
-    console.log(item);
-
     fetch(`https://taskforum.herokuapp.com/api/post/${item._id}`, {
       method: "DELETE",
       headers: {
@@ -120,6 +118,7 @@ export const Posts = (props) => {
       })
       .catch((err) => console.log(err));
   };
+//Edit Post
   const handleEditPost = (post) => {
     console.log("post Details :", post);
     //  fetch(`https://taskforum.herokuapp.com/api/post/${id}`, {
@@ -133,6 +132,7 @@ export const Posts = (props) => {
     //    .then((res) => console.log(res))
     //    .catch((err) => console.log(err));
   };
+//Get All Posts
   useEffect(
     () => {
       fetch("https://taskforum.herokuapp.com/api/post/", {
@@ -295,7 +295,7 @@ export const Posts = (props) => {
                   </Card>
                 </Link>
                 {/* {console.log(post._id, "post")} */}
-                <RecentComments postId={post._id} />
+                <RecentComments data={data} setData={setData} postId={post._id} />
                 <Link
                   to={`/AllComments/${post._id}`}
                   className={classes.Link}
@@ -303,11 +303,12 @@ export const Posts = (props) => {
                 >
                   {"View more comments"}
                 </Link>
-
+                  
                 <TextField
                   fullWidth
                   label="Write Comment"
                   id="fullWidth"
+                  
                   onChange={(e) => {
                     props.setComment(e.target.value);
                     console.log(e.target.value);

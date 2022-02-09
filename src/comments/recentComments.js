@@ -16,35 +16,12 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-export const RecentComments = ({ postId }) => {
+export const RecentComments = ({ handleCommentEdit,handleCommentDelete,postId,data,setData }) => {
   const classes = useStyles();
   const [comments, setComments] = useState([]);
-  const handleDelete = (id) => {
-    fetch(`https://taskforum.herokuapp.com/api/comment/${id}`, {
-      method: "DELETE",
-      headers: {
-        "content-type": "application/json",
-        Authorization: "Bearer " + localStorage.getItem("token"),
-      },
-    })
-      .then((res) => res.json()) // or res.json()
-      .then((res) => console.log(res))
-      .catch((err) => console.log(err));
-  };
-  const handleCommentEdit = (id) => {
-    console.log("comment id :", id);
-    //  fetch(`https://taskforum.herokuapp.com/api/comment/${id}`, {
-    //    method: "PUT",
-    //    headers: {
-    //      "content-type": "application/json",
-    //      Authorization: "Bearer " + localStorage.getItem("token"),
-    //    },
-    //  })
-    //    .then((res) => res.json()) // or res.json()
-    //    .then((res) => console.log(res))
-    //    .catch((err) => console.log(err));
-  };
 
+
+//Get Post Comments
   useEffect(() => {
     fetch(`https://taskforum.herokuapp.com/api/comment/post/${postId}`, {
       method: "Get",
@@ -61,15 +38,14 @@ export const RecentComments = ({ postId }) => {
       .catch((error) => {
         console.error("Error:", error);
       });
-  }, []);
+  },[]);
 
   return (
     <div>
       <h3 className={classes.comments}>Comments</h3>
       <Grid container wrap="nowrap" spacing={2}>
         <div className={classes.commentBox}>
-          {console.log("comments", comments)}
-          {comments.length != 0 ? (
+          {comments.length !== 0 ? (
             comments
               .sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
               .slice(0, 3)
@@ -90,7 +66,7 @@ export const RecentComments = ({ postId }) => {
                         <Button
                           variant="outlined"
                           size="small"
-                          onClick={() => handleDelete(x._id)}
+                          onClick={() => handleCommentDelete(x._id)}
                         >
                           Delete{" "}
                         </Button>
@@ -100,9 +76,14 @@ export const RecentComments = ({ postId }) => {
                       <Avatar alt="Remy Sharp" src={imgLink} />
                     </Grid>
                     <Grid item xs zeroMinWidth>
-                      <h4 style={{ margin: 0, textAlign: "left" }}>
-                        Michel Michel
-                      </h4>
+                      <div style={{ margin: 0, textAlign: "left" }}>
+                        {x.user ? 
+                         <h4>{x.user.name}</h4>
+                         :
+                         
+                        <h4>Michel</h4>
+                        }
+                      </div>
                       <p style={{ textAlign: "left" }}>{x.comment}. </p>
                       <p style={{ textAlign: "left", color: "gray" }}>
                         {dt.toLocaleString()}

@@ -15,24 +15,13 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-export const AllComments = () => {
+export const AllComments = (props) => {
   const classes = useStyles();
   const { postId } = useParams();
   const [allComments, setAllComments] = useState([]);
-  const handleDelete = (id, com) => {
-    console.log(com, "asasasas");
+  //Delete Comment
 
-    fetch(`https://taskforum.herokuapp.com/api/comment/${id}`, {
-      method: "DELETE",
-      headers: {
-        "content-type": "application/json",
-        Authorization: "Bearer " + localStorage.getItem("token"),
-      },
-    })
-      .then((res) => res.json()) // or res.json()
-      .then((res) => console.log(res))
-      .catch((err) => console.log(err));
-  };
+  //Get All Post Comments
   useEffect(() => {
     fetch(`https://taskforum.herokuapp.com/api/comment/post/${postId}`, {
       method: "Get",
@@ -75,7 +64,7 @@ export const AllComments = () => {
                       <Button
                         variant="outlined"
                         size="small"
-                        onClick={() => handleDelete(com._id, com)}
+                        onClick={() => props.handleCommentDelete(com._id, com)}
                       >
                         Delete{" "}
                       </Button>

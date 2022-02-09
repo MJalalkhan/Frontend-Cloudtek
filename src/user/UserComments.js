@@ -1,7 +1,9 @@
-import { Divider, Avatar, Grid, Paper, Container } from "@material-ui/core";
+import { Divider, Avatar, Grid, Paper, Container, Button } from "@material-ui/core";
 import { makeStyles } from "@material-ui/core/styles";
 import { useEffect, useState } from "react";
-import Header from "../Comps/Header";
+
+import { UserHeader } from "./UserHeader";
+
 
 const imgLink =
   "https://images.pexels.com/photos/1681010/pexels-photo-1681010.jpeg?auto=compress&cs=tinysrgb&dpr=3&h=750&w=1260";
@@ -13,11 +15,13 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-export const UserComments = () => {
+export const UserComments = (props) => {
+
   const classes = useStyles();
+  let userId=localStorage.getItem("userId");
   const [allComments, setAllComments] = useState([]);
   useEffect(() => {
-    fetch(`https://taskforum.herokuapp.com/api/comment/user/:user_id`, {
+    fetch(`https://taskforum.herokuapp.com/api/comment/user/${userId}`, {
       method: "Get",
       headers: {
         "content-type": "application/json",
@@ -40,16 +44,32 @@ export const UserComments = () => {
 
   return (
     <div className="App">
-      <Header />
+      <UserHeader />
+      
       <Container maxWidth="sm">
         <h3 className={classes.comments}>Comments</h3>
         <Paper style={{ padding: "10px 20px" }}>
-          {allComments.map((com, index) => {
+          {
+          allComments.map((com, index) => {
             var dt = new Date(com.user.created_at);
             return (
-              <>
+              <div key={index}>
+              {com.user === localStorage.getItem("userId") && (
+                    // return(
+                    <>
+                      <Button variant="outlined" size="small" onClick={props.handleCommentEdit}>
+                        Edit
+                      </Button>
+                      <Button
+                        variant="outlined"
+                        size="small"
+                        onClick={() => props.handleDelete(com._id)}
+                      >
+                        Delete{" "}
+                      </Button>
+                    </>
+                  )}
                 <Grid container wrap="nowrap" spacing={2} key={index}>
-                  {console.log(com, "commmm")}
                   <Grid item>
                     <Avatar alt="Remy Sharp" src={imgLink} />
                   </Grid>
@@ -64,7 +84,7 @@ export const UserComments = () => {
                   </Grid>
                 </Grid>
                 <Divider variant="fullWidth" style={{ margin: "10px 0" }} />
-              </>
+              </div>
             );
           })}
         </Paper>

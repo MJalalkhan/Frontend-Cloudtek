@@ -9,9 +9,41 @@ import { RecentComments } from "./comments/recentComments";
 import { AllComments } from "./comments/AllComments";
 import EditProfile from "./user/EditProfile";
 import { UserComments } from "./user/UserComments";
+import { UserPosts } from "./user/UserPosts";
+import { UserHeader } from "./user/UserHeader";
 function App() {
   const [comment, setComment] = useState("");
+//DeleteComment
+  const handleCommentDelete = (id) => {
+    // console.log(com, "asasasas");
 
+    fetch(`https://taskforum.herokuapp.com/api/comment/${id}`, {
+      method: "DELETE",
+      headers: {
+        "content-type": "application/json",
+        Authorization: "Bearer " + localStorage.getItem("token"),
+      },
+    })
+      .then((res) => res.json()) // or res.json()
+      .then((res) => console.log(res))
+      .catch((err) => console.log(err));
+  };
+
+ //Edit Comment
+ const handleCommentEdit = (id) => {
+  console.log("comment id :", id);
+  //  fetch(`https://taskforum.herokuapp.com/api/comment/${id}`, {
+  //    method: "PUT",
+  //    headers: {
+  //      "content-type": "application/json",
+  //      Authorization: "Bearer " + localStorage.getItem("token"),
+  //    },
+  //  })
+  //    .then((res) => res.json()) // or res.json()
+  //    .then((res) => console.log(res))
+  //    .catch((err) => console.log(err));
+};
+//Add Comment
   const postComment = (msg, post, user) => {
     if (!msg == "") {
       console.log("Comment = ", msg);
@@ -23,7 +55,6 @@ function App() {
       };
 
       console.log("user+comment+post = ", obj);
-
       fetch("https://taskforum.herokuapp.com/api/comment/", {
         method: "POST", // or 'PUT'
         headers: {
@@ -52,6 +83,7 @@ function App() {
           <Route path="/" element={<SignIn />} />
           <Route path="signUp" element={<SignUp />} />
           <Route path="editProfile" element={<EditProfile />} />
+          <Route path="userHeader" element={<UserHeader />} />
 
           {/* POSTS */}
           <Route
@@ -76,11 +108,22 @@ function App() {
               />
             }
           />
+          <Route
+            exact
+            path="/userPosts"
+            element={
+              <UserPosts
+                postComment={postComment}
+                comment={comment}
+                setComment={setComment}
+              />
+            }
+          />
 
           {/* COMMENTS */}
           <Route path="recentComments" element={<RecentComments />} />
-          <Route path="/AllComments/:postId" element={<AllComments />} />
-          <Route path="/userComments/:id" element={<UserComments />} />
+          <Route path="/AllComments/:postId" element={<AllComments  handleCommentDelete={handleCommentDelete} handleCommentEdit={handleCommentEdit}/>} />
+          <Route path="/userComments" element={<UserComments handleCommentDelete={handleCommentDelete} handleCommentEdit={handleCommentEdit}/>} />
         </Routes>
       </BrowserRouter>
     </div>

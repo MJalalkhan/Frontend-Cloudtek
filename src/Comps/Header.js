@@ -87,8 +87,8 @@ export default function Header() {
                 </MenuItem>
                 <MenuItem onClick={handleClose}>
                   <Link
-                    // to={`/userComments${}`}
-                    to="#"
+                    to={`/userComments`}
+                    
                     style={{ textDecoration: "none", color: "black" }}
                   >
                     Profile
