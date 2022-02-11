@@ -13,11 +13,8 @@ import {
   Divider,
 } from "@material-ui/core";
 
-import { IconButton, InputAdornment, TextField } from "@mui/material";
-import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
 import { RecentComments } from "../comments/recentComments";
 import { useParams } from "react-router-dom";
-import { Link } from "react-router-dom";
 import Header from "../Comps/Header";
 const useStyles = makeStyles((theme) => ({
   appBar: {
@@ -69,7 +66,7 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-export const SinglePost = (props) => {
+export const SinglePost = () => {
   const classes = useStyles();
   let { id } = useParams();
   const [data, setData] = useState([]);
@@ -127,60 +124,26 @@ export const SinglePost = (props) => {
                 </CardContent>
               </CardActionArea>
               <CardActions className={classes.cardActions}>
-                <Box className={classes.author}>
-                  <Avatar src="https://images.pexels.com/photos/220453/pexels-photo-220453.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=750&w=1260" />
-                  <Box ml={2}>
-                    <Typography variant="subtitle2" component="p">
-                      {/* {data.user.name} */}
-                    </Typography>
-                    <Typography
-                      variant="subtitle2"
-                      color="textSecondary"
-                      component="p"
-                    >
-                      {/* {dt.toLocaleString()} */}
-                    </Typography>
+                {data.user && (
+                  <Box className={classes.author}>
+                    <Avatar src="https://images.pexels.com/photos/220453/pexels-photo-220453.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=750&w=1260" />
+                    <Box ml={2}>
+                      <Typography variant="subtitle2" component="p">
+                        {data.user.name}
+                      </Typography>
+                      <Typography
+                        variant="subtitle2"
+                        color="textSecondary"
+                        component="p"
+                      >
+                        {/* {dt.toLocaleString()} */}
+                      </Typography>
+                    </Box>
                   </Box>
-                </Box>
+                )}
               </CardActions>
               <Divider variant="fullWidth" style={{ margin: "5px 0" }} />
-              {data.length !== 0 ? <RecentComments postId={data._id} /> : ""}
-
-              <Link
-                to={`/AllComments/${data._id}`}
-                className={classes.Link}
-                underline="hover"
-              >
-                {"View more comments"}
-              </Link>
-              <TextField
-                fullWidth
-                label="Write Comment"
-                id="fullWidth"
-                onChange={(e) => {
-                  props.setComment(e.target.value);
-                  console.log(e.target.value);
-                }}
-                InputProps={{
-                  endAdornment: (
-                    <InputAdornment position="end">
-                      <IconButton
-                        edge="end"
-                        color="primary"
-                        onClick={() =>
-                          props.postComment(
-                            props.comment,
-                            data._id,
-                            data.user._id
-                          )
-                        }
-                      >
-                        <ArrowForwardIosIcon />
-                      </IconButton>
-                    </InputAdornment>
-                  ),
-                }}
-              />
+              {data.length !== 0 ? <RecentComments postId={data._id}  data={data} setData={setData} /> : ""}
             </Card>
           </Grid>
         </Grid>

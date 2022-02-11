@@ -1,8 +1,8 @@
 import { Divider, Avatar, Grid, Paper, Container } from "@material-ui/core";
 import { makeStyles } from "@material-ui/core/styles";
-import { AppBar, Button, Toolbar, Typography } from "@mui/material";
+import {  Button } from "@mui/material";
 import { useEffect, useState } from "react";
-import { Link, useParams } from "react-router-dom";
+import {  useParams } from "react-router-dom";
 import Header from "../Comps/Header";
 
 const imgLink =
@@ -19,7 +19,6 @@ export const AllComments = (props) => {
   const classes = useStyles();
   const { postId } = useParams();
   const [allComments, setAllComments] = useState([]);
-  //Delete Comment
 
   //Get All Post Comments
   useEffect(() => {

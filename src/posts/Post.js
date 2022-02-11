@@ -10,13 +10,11 @@ import {
   CardActions,
   CardContent,
   Avatar,
-  Divider,
 } from "@material-ui/core";
 import CreateIcon from "@mui/icons-material/Create";
-import { IconButton, InputAdornment, TextField, Button } from "@mui/material";
+import { TextField, Button } from "@mui/material";
 import { Link } from "react-router-dom";
 import { RecentComments } from "../comments/recentComments";
-import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
 import Header from "../Comps/Header";
 
 const useStyles = makeStyles((theme) => ({
@@ -68,18 +66,17 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-export const Posts = (props) => {
+export const Posts = ({data,setData}) => {
   const classes = useStyles();
-  const [data, setData] = useState([]);
 //Create Post
   const handleAddPost = (event) => {
     event.preventDefault();
-    const data = new FormData(event.currentTarget);
+    const formData = new FormData(event.currentTarget);
     let obj = {
       user: localStorage.getItem("userId"),
-      title: data.get("title"),
-      description: data.get("description"),
-      category: data.get("category"),
+      title: formData.get("title"),
+      description: formData.get("description"),
+      category: formData.get("category"),
     };
     console.log("data obj ", obj);
     fetch("https://taskforum.herokuapp.com/api/post/", {
@@ -108,13 +105,16 @@ export const Posts = (props) => {
         Authorization: "Bearer " + localStorage.getItem("token"),
       },
     })
-      .then((res) => res.json()) // or res.json()
+      .then((res) => res.json())
       .then((res) => {
         console.log(res);
-        let result = data.map((x, index) => {
-          return x.id !== item._id;
-        });
-        setData(result);
+        setData(data.filter((post)=>{
+          if(post._id === item._id){
+            return false
+          }
+        return true
+        }))
+        
       })
       .catch((err) => console.log(err));
   };
@@ -232,7 +232,8 @@ export const Posts = (props) => {
           Posts
         </Typography>
         <Grid container spacing={3}>
-          {data.map((post, index) => {
+          {data.length!==0 &&
+          data.map((post, index) => {
             var dt = new Date(post.user.created_at);
             return (
               <Grid item xs={12} key={index} style={{ margin: "10px" }}>
@@ -295,45 +296,10 @@ export const Posts = (props) => {
                   </Card>
                 </Link>
                 {/* {console.log(post._id, "post")} */}
-                <RecentComments data={data} setData={setData} postId={post._id} />
-                <Link
-                  to={`/AllComments/${post._id}`}
-                  className={classes.Link}
-                  underline="hover"
-                >
-                  {"View more comments"}
-                </Link>
+                <RecentComments data={data} setData={setData} postId={post._id}   />
+                
                   
-                <TextField
-                  fullWidth
-                  label="Write Comment"
-                  id="fullWidth"
-                  
-                  onChange={(e) => {
-                    props.setComment(e.target.value);
-                    console.log(e.target.value);
-                  }}
-                  InputProps={{
-                    endAdornment: (
-                      <InputAdornment position="end">
-                        <IconButton
-                          edge="end"
-                          color="primary"
-                          onClick={() =>
-                            props.postComment(
-                              props.comment,
-                              post._id,
-                              localStorage.getItem("userId")
-                            )
-                          }
-                        >
-                          <ArrowForwardIosIcon />
-                        </IconButton>
-                      </InputAdornment>
-                    ),
-                  }}
-                />
-                <Divider variant="fullWidth" style={{ marginTop: "20px" }} />
+                
               </Grid>
             );
           })}

@@ -1,10 +1,22 @@
-import { Divider, Avatar, Grid, Paper, Container, Button, Card, CardActionArea, CardContent, Typography, CardActions, Box } from "@material-ui/core";
+import {
+  Divider,
+  Avatar,
+  Grid,
+  Paper,
+  Container,
+  Button,
+  Card,
+  CardActionArea,
+  CardContent,
+  Typography,
+  CardActions,
+  Box,
+} from "@material-ui/core";
 import { makeStyles } from "@material-ui/core/styles";
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 
 import { UserHeader } from "./UserHeader";
-
 
 const imgLink =
   "https://images.pexels.com/photos/1681010/pexels-photo-1681010.jpeg?auto=compress&cs=tinysrgb&dpr=3&h=750&w=1260";
@@ -63,10 +75,11 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 export const UserComments = (props) => {
-
   const classes = useStyles();
-  let userId=localStorage.getItem("userId");
+  let userId = localStorage.getItem("userId");
   const [allComments, setAllComments] = useState([]);
+
+  //Get User All Comments
   useEffect(() => {
     fetch(`https://taskforum.herokuapp.com/api/comment/user/${userId}`, {
       method: "Get",
@@ -92,20 +105,23 @@ export const UserComments = (props) => {
   return (
     <div className="App">
       <UserHeader />
-      
+
       <Container maxWidth="sm">
         <h3 className={classes.comments}>Comments</h3>
         <Paper style={{ padding: "10px 20px" }}>
-          {
-          allComments.map((com, index) => {
-            var dt = new Date(com.user.created_at);
-            return (
-              <div key={index}>
-                
-              {com.user === localStorage.getItem("userId") && (
+          {allComments.length !== 0 ? (
+            allComments.map((com, index) => {
+              var dt = new Date(com.user.created_at);
+              return (
+                <div key={index}>
+                  {com.user === localStorage.getItem("userId") && (
                     // return(
                     <>
-                      <Button variant="outlined" size="small" onClick={props.handleCommentEdit}>
+                      <Button
+                        variant="outlined"
+                        size="small"
+                        onClick={props.handleCommentEdit}
+                      >
                         Edit
                       </Button>
                       <Button
@@ -117,66 +133,73 @@ export const UserComments = (props) => {
                       </Button>
                     </>
                   )}
-                  <Link className={classes.Link} to={`/SinglePost/${com.post._id}`}>
-                  <Card className={classes.card}>
-                    <CardActionArea>
-                      <CardContent>
-                        <Typography gutterBottom variant="h5" component="h2">
-                          {com.post.title}
-                        </Typography>
-                        <Typography gutterBottom variant="h6" component="h6">
-                          Category: {com.post.category}
-                        </Typography>
-                        <Typography
-                          variant="body2"
-                          color="textSecondary"
-                          component="p"
-                        >
-                          {com.post.description}
-                        </Typography>
-                      </CardContent>
-                    </CardActionArea>
-
-                    <CardActions className={classes.cardActions}>
-                      <Box className={classes.author}>
-                        <Avatar src="https://images.pexels.com/photos/220453/pexels-photo-220453.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=750&w=1260" />
-                        <Box ml={2}>
-                          <Typography variant="subtitle2" component="p">
-                            Author: <strong>{com.post.user.name}</strong>
+                  <Link
+                    className={classes.Link}
+                    to={`/SinglePost/${com.post._id}`}
+                  >
+                    <Card className={classes.card}>
+                      <CardActionArea>
+                        <CardContent>
+                          <Typography gutterBottom variant="h5" component="h2">
+                            {com.post.title}
+                          </Typography>
+                          <Typography gutterBottom variant="h6" component="h6">
+                            Category: {com.post.category}
                           </Typography>
                           <Typography
-                            variant="subtitle2"
+                            variant="body2"
                             color="textSecondary"
                             component="p"
                           >
-                            {dt.toLocaleString()}
+                            {com.post.description}
                           </Typography>
-                        </Box>
-                      </Box>
-                    </CardActions>
-                  </Card>
-                </Link>
-                <h3 className={classes.comments}>Comments</h3>
+                        </CardContent>
+                      </CardActionArea>
 
-                <Grid container wrap="nowrap" spacing={2} key={index}>
-                
-                  <Grid item>
-                    <Avatar alt="Remy Sharp" src={imgLink} />
+                      <CardActions className={classes.cardActions}>
+                        <Box className={classes.author}>
+                          <Avatar src="https://images.pexels.com/photos/220453/pexels-photo-220453.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=750&w=1260" />
+                          <Box ml={2}>
+                            <Typography variant="subtitle2" component="p">
+                              Author: <strong>{com.post.user.name}</strong>
+                            </Typography>
+                            <Typography
+                              variant="subtitle2"
+                              color="textSecondary"
+                              component="p"
+                            >
+                              {dt.toLocaleString()}
+                            </Typography>
+                          </Box>
+                        </Box>
+                      </CardActions>
+                    </Card>
+                  </Link>
+                  <h3 className={classes.comments}>Comments</h3>
+
+                  <Grid container wrap="nowrap" spacing={2} key={index}>
+                    <Grid item>
+                      <Avatar alt="Remy Sharp" src={imgLink} />
+                    </Grid>
+                    <Grid item xs zeroMinWidth>
+                      <h4 style={{ margin: 0, textAlign: "left" }}>
+                        {com.user.name}
+                      </h4>
+                      <p style={{ textAlign: "left" }}>{com.comment}</p>
+                      <p style={{ textAlign: "left", color: "gray" }}>
+                        {dt.toLocaleString()}
+                      </p>
+                    </Grid>
                   </Grid>
-                  <Grid item xs zeroMinWidth>
-                    <h4 style={{ margin: 0, textAlign: "left" }}>
-                      {com.user.name}
-                    </h4>
-                    <p style={{ textAlign: "left" }}>{com.comment}</p>
-                    <p style={{ textAlign: "left", color: "gray" }}>
-                      {dt.toLocaleString()}
-                    </p>
-                  </Grid>
-                </Grid>
-                <Divider variant="fullWidth" style={{ margin: "10px 0" }} />
-              </div>
-            );
-          })}
+                  <Divider variant="fullWidth" style={{ margin: "10px 0" }} />
+                </div>
+              );
+            })
+          ) : (
+            <div>
+              <h3>No Comments</h3>
+            </div>
+          )}
         </Paper>
       </Container>
     </div>
