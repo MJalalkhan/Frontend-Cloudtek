@@ -28,7 +28,7 @@ function App() {
           {/* POSTS */}
           <Route exact path="AllPosts" element={<Posts data={data} setData={setData} comments={comments} setComments={setComments}/>} />
           <Route exact path="/SinglePost/:id" element={<SinglePost />} />
-          <Route exact path="/userPosts" element={<UserPosts />} />
+          <Route exact path="/userPosts" element={<UserPosts data={data} setData={setData}/>} />
 
           {/* COMMENTS */}
           <Route path="recentComments" element={<RecentComments data={data} setData={setData}/>} />

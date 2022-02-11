@@ -152,9 +152,8 @@ export const Posts = ({data,setData}) => {
         .catch((error) => {
           console.error("Error:", error);
         });
-    },
-    [],
-    [data]
+    },[setData]
+    
   );
   return (
     <div className="App">
@@ -237,7 +236,7 @@ export const Posts = ({data,setData}) => {
             var dt = new Date(post.user.created_at);
             return (
               <Grid item xs={12} key={index} style={{ margin: "10px" }}>
-                {post.user._id === localStorage.getItem("userId") && (
+                {(typeof (post.user) == "object" && post.user._id === localStorage.getItem("userId")) || ((typeof (post.user) == "string" && post.user) === (localStorage.getItem("userId"))) ? (
                   // return(
                   <>
                     <Button
@@ -245,6 +244,7 @@ export const Posts = ({data,setData}) => {
                       size="small"
                       onClick={() => handleEditPost(post)}
                     >
+                      {console.log(post.user,'userrerer')}
                       Edit
                     </Button>
                     <Button
@@ -255,7 +255,10 @@ export const Posts = ({data,setData}) => {
                       Delete{" "}
                     </Button>
                   </>
-                )}
+                )
+              :
+            ''
+          }
                 <Link className={classes.Link} to={`/SinglePost/${post._id}`}>
                   <Card className={classes.card}>
                     <CardActionArea>

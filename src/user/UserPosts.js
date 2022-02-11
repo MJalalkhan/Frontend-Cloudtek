@@ -1,12 +1,4 @@
-import {
-  Divider,
-  Avatar,
-  Grid,
-  Paper,
-  Container,
-  Button,
-  Link,
-} from "@material-ui/core";
+import { Avatar, Grid, Button, Link } from "@material-ui/core";
 import { useEffect, useState } from "react";
 import { UserHeader } from "./UserHeader";
 
@@ -20,10 +12,8 @@ import {
   CardActions,
   CardContent,
 } from "@material-ui/core";
-import CreateIcon from "@mui/icons-material/Create";
-import { IconButton, InputAdornment, TextField } from "@mui/material";
+
 import { RecentComments } from "../comments/recentComments";
-import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
 
 const useStyles = makeStyles((theme) => ({
   appBar: {
@@ -74,12 +64,57 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-export const UserPosts = (props) => {
+export const UserPosts = ({ data, setData }) => {
   const [userPosts, setUserPosts] = useState([]);
   const classes = useStyles();
 
   let userId = localStorage.getItem("userId");
   //   const [allPosts, setAllPosts] = useState([]);
+  const handleDeletePost = (item) => {
+    fetch(`https://taskforum.herokuapp.com/api/post/${item._id}`, {
+      method: "DELETE",
+      headers: {
+        "content-type": "application/json",
+        Authorization: "Bearer " + localStorage.getItem("token"),
+      },
+    })
+      .then((res) => res.json())
+      .then((res) => {
+        console.log(res);
+
+        setData(
+          data.filter((post) => {
+            if (post._id === item._id) {
+              return false;
+            }
+            return true;
+          })
+        );
+        setUserPosts(
+          data.filter((post) => {
+            if (post._id === item._id) {
+              return false;
+            }
+            return true;
+          })
+        );
+      })
+      .catch((err) => console.log(err));
+  };
+  //Edit Post
+  const handleEditPost = (post) => {
+    console.log("post Details :", post);
+    //  fetch(`https://taskforum.herokuapp.com/api/post/${id}`, {
+    //    method: "PUT",
+    //    headers: {
+    //      "content-type": "application/json",
+    //      Authorization: "Bearer " + localStorage.getItem("token"),
+    //    },
+    //  })
+    //    .then((res) => res.json()) // or res.json()
+    //    .then((res) => console.log(res))
+    //    .catch((err) => console.log(err));
+  };
   useEffect(() => {
     fetch(`https://taskforum.herokuapp.com/api/post/user/${userId}`, {
       method: "Get",
@@ -100,7 +135,7 @@ export const UserPosts = (props) => {
       .catch((error) => {
         console.error("Error:", error);
       });
-  }, []);
+  }, [userId]);
 
   return (
     <div className="App">
@@ -116,14 +151,14 @@ export const UserPosts = (props) => {
                   <Button
                     variant="outlined"
                     size="small"
-                    //   onClick={() => handleEditPost(post)}
+                    onClick={() => handleEditPost(post)}
                   >
                     Edit
                   </Button>
                   <Button
                     variant="outlined"
                     size="small"
-                    //   onClick={() => handleDeletePost(post)}
+                    onClick={() => handleDeletePost(post)}
                   >
                     Delete{" "}
                   </Button>
@@ -168,45 +203,7 @@ export const UserPosts = (props) => {
                   </CardActions>
                 </Card>
               </Link>
-              {/* {console.log(post._id, "post")} */}
               <RecentComments postId={post._id} />
-              <Link
-                to={`/AllComments/${post._id}`}
-                className={classes.Link}
-                underline="hover"
-              >
-                {"View more comments"}
-              </Link>
-
-              <TextField
-                fullWidth
-                label="Write Comment"
-                id="fullWidth"
-                onChange={(e) => {
-                  props.setComment(e.target.value);
-                  console.log(e.target.value);
-                }}
-                InputProps={{
-                  endAdornment: (
-                    <InputAdornment position="end">
-                      <IconButton
-                        edge="end"
-                        color="primary"
-                        onClick={() =>
-                          props.postComment(
-                            props.comment,
-                            post._id,
-                            localStorage.getItem("userId")
-                          )
-                        }
-                      >
-                        <ArrowForwardIosIcon />
-                      </IconButton>
-                    </InputAdornment>
-                  ),
-                }}
-              />
-              <Divider variant="fullWidth" style={{ marginTop: "20px" }} />
             </Grid>
           );
         })

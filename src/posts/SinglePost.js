@@ -69,7 +69,7 @@ const useStyles = makeStyles((theme) => ({
 export const SinglePost = () => {
   const classes = useStyles();
   let { id } = useParams();
-  const [data, setData] = useState([]);
+  const [singlePostData, setSinglePostData] = useState([]);
 
   useEffect(() => {
     fetch(`https://taskforum.herokuapp.com/api/post/${id}`, {
@@ -81,12 +81,8 @@ export const SinglePost = () => {
     })
       .then((response) => response.json())
       .then((res) => {
-        setData(res.data);
+        setSinglePostData(res.data);
         console.log("Single Post :", res);
-        if (res.token) {
-          var dt = new Date(data.user.created_at);
-        }
-        return;
       })
       .catch((error) => {
         console.error("Error:", error);
@@ -96,6 +92,7 @@ export const SinglePost = () => {
   return (
     <div className="App">
       <Header />
+
       <Box className={classes.hero}>
         <Box>React Posts</Box>
       </Box>
@@ -109,27 +106,27 @@ export const SinglePost = () => {
               <CardActionArea>
                 <CardContent>
                   <Typography gutterBottom variant="h5" component="h2">
-                    {data.title}
+                    {singlePostData.title}
                   </Typography>
                   <Typography gutterBottom variant="h6" component="h6">
-                    Category: {data.category}
+                    Category: {singlePostData.category}
                   </Typography>
                   <Typography
                     variant="body2"
                     color="textSecondary"
                     component="p"
                   >
-                    {data.description}
+                    {singlePostData.description}
                   </Typography>
                 </CardContent>
               </CardActionArea>
               <CardActions className={classes.cardActions}>
-                {data.user && (
+                {singlePostData.user && (
                   <Box className={classes.author}>
                     <Avatar src="https://images.pexels.com/photos/220453/pexels-photo-220453.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=750&w=1260" />
                     <Box ml={2}>
                       <Typography variant="subtitle2" component="p">
-                        {data.user.name}
+                        {singlePostData.user.name}
                       </Typography>
                       <Typography
                         variant="subtitle2"
@@ -143,7 +140,15 @@ export const SinglePost = () => {
                 )}
               </CardActions>
               <Divider variant="fullWidth" style={{ margin: "5px 0" }} />
-              {data.length !== 0 ? <RecentComments postId={data._id}  data={data} setData={setData} /> : ""}
+              {singlePostData.length !== 0 ? (
+                <RecentComments
+                  postId={singlePostData._id}
+                  data={singlePostData}
+                  setData={setSinglePostData}
+                />
+              ) : (
+                ""
+              )}
             </Card>
           </Grid>
         </Grid>

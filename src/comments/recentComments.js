@@ -29,8 +29,10 @@ const useStyles = makeStyles((theme) => ({
 
 export const RecentComments = ({ postId ,data,setData }) => {
   const classes = useStyles();
-  const [commenting, setCommenting] = useState([]);
+  const [commenting, setCommenting] = useState('');
   const [editComment, setEditComment] = useState(false);
+  const [editValue, setEditValue] = useState('');
+  
   const [comments, setComments] = useState([]);
   //Add Comment
   const postComment = (msg, post, user) => {
@@ -52,12 +54,13 @@ export const RecentComments = ({ postId ,data,setData }) => {
         },
 
         body: JSON.stringify(obj),
-      })
+      }) 
         .then((response) => response.json())
         .then((res) => {
           console.log(res.data, "resssss");
           setComments([...comments, res.data]);
           setData([...data])
+          setCommenting('')
         })
         .catch((error) => {
           console.error("Error:", error);
@@ -96,6 +99,7 @@ export const RecentComments = ({ postId ,data,setData }) => {
 
   //Edit Comment
   const handleCommentEdit = (id,updateComment) => {
+    console.log(editValue,'herereer');
     setEditComment(true);
     console.log("comment id :", id);
      fetch(`https://taskforum.herokuapp.com/api/comment/${id}`, {
@@ -139,7 +143,7 @@ export const RecentComments = ({ postId ,data,setData }) => {
       <h3 className={classes.comments}>Comments</h3>
       <Grid container wrap="nowrap" spacing={2}>
         <div className={classes.commentBox}>
-          {console.log(comments,'comsssssss')}
+          {/* {console.log(comments,'comsssssss')} */}
           {comments.length !== 0 ? (
             comments
               .sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
@@ -149,7 +153,7 @@ export const RecentComments = ({ postId ,data,setData }) => {
 
                 return (
                   <div key={index}>
-                    {x.user && x.user._id === localStorage.getItem("userId") && (
+                    {(x.user && x.user._id === localStorage.getItem("userId")) ? (
                       <>
                         <Button
                           variant="outlined"
@@ -166,14 +170,23 @@ export const RecentComments = ({ postId ,data,setData }) => {
                           Delete{" "}
                         </Button>
                       </>
-                    )}
+                    )
+                  :
+                  ''}
                     {editComment && (
-                      <TextField
+                      comments.map((edit,index)=>{
+                        if(edit._id === x._id){
+                          // console.log(edit,'eeeeeeeeeeeeeeeeeeeedit',x._id,'xxxxxxxxxxx');
+                          
+                        return(
+                        <TextField
+                        key={index}
                         fullWidth
                         label="Write Comment"
                         id="fullWidth"
+                        value={edit.comment}
                         onChange={(e) => {
-                          setCommenting(e.target.value);
+                          setEditValue(e.target.value);
                           console.log(e.target.value);
                         }}
                         InputProps={{
@@ -183,10 +196,8 @@ export const RecentComments = ({ postId ,data,setData }) => {
                                 edge="end"
                                 color="primary"
                                 onClick={() =>
-                                  postComment(
-                                    commenting,
-                                    postId,
-                                    localStorage.getItem("userId")
+                                  handleCommentEdit(
+                                    edit._id
                                   )
                                 }
                               >
@@ -195,8 +206,15 @@ export const RecentComments = ({ postId ,data,setData }) => {
                               
                             </InputAdornment>
                           ),
-                        }}
+                          
+                        }
+                      }
                       />
+                      )}else{
+                        return null
+                      }
+                      })
+                      
                       
                     )}
                     <Grid item>
@@ -230,6 +248,7 @@ export const RecentComments = ({ postId ,data,setData }) => {
               fullWidth
               label="Write Comment"
               id="fullWidth"
+              value={commenting}
               onChange={(e) => {
                 setCommenting(e.target.value);
                 console.log(e.target.value);
@@ -255,9 +274,9 @@ export const RecentComments = ({ postId ,data,setData }) => {
                 ),
               }}
             />
-            <Divider variant="fullWidth" style={{ marginTop: "20px" }} />
           </div>
         </div>
+            <Divider variant="fullWidth" style={{ marginTop: "20px" }} />
       </Grid>
       {/* <Divider variant="fullWidth" style={{ margin: "10px 0" }} /> */}
     </div>
