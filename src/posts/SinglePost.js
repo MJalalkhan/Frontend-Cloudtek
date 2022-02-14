@@ -87,7 +87,7 @@ export const SinglePost = () => {
       .catch((error) => {
         console.error("Error:", error);
       });
-  }, []);
+  }, [id]);
 
   return (
     <div className="App">

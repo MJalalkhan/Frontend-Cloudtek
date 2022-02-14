@@ -41,7 +41,7 @@ export default function EditProfile() {
       .catch((error) => {
         console.error("Error:", error);
       });
-  }, []);
+  }, [userId]);
 
   //Update User
   const handleSubmit = (event) => {

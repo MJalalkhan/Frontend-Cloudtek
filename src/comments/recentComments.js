@@ -140,7 +140,7 @@ export const RecentComments = ({ postId, data, setData }) => {
           console.error("Error:", error);
         });
     }, 500);
-  }, []);
+  }, [postId]);
 
   return (
     <div>

@@ -41,7 +41,7 @@ export const AllComments = (props) => {
       .catch((error) => {
         console.error("Error:", error);
       });
-  }, []);
+  }, [postId]);
 
   return (
     <div className="App">

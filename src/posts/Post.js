@@ -68,6 +68,11 @@ const useStyles = makeStyles((theme) => ({
 
 export const Posts = ({ data, setData }) => {
   const classes = useStyles();
+  const [editPost, setEditPost] = useState(null);
+  const [editTitle, setEditTitle] = useState("");
+  const [editCategory, setEditCategory] = useState("");
+  const [editDesc, setEditDesc] = useState("");
+
   //Create Post
   const handleAddPost = (event) => {
     event.preventDefault();
@@ -120,18 +125,39 @@ export const Posts = ({ data, setData }) => {
       .catch((err) => console.log(err));
   };
   //Edit Post
-  const handleEditPost = (post) => {
-    console.log("post Details :", post);
-    //  fetch(`https://taskforum.herokuapp.com/api/post/${id}`, {
-    //    method: "PUT",
-    //    headers: {
-    //      "content-type": "application/json",
-    //      Authorization: "Bearer " + localStorage.getItem("token"),
-    //    },
-    //  })
-    //    .then((res) => res.json()) // or res.json()
-    //    .then((res) => console.log(res))
-    //    .catch((err) => console.log(err));
+  const handleEditPost = (postId, title, category, description) => {
+    setEditTitle(title);
+    setEditCategory(category);
+    setEditDesc(description);
+    console.log("post Details :", postId);
+    let obj = {
+      title: title,
+      category: category,
+      description: description,
+    };
+    console.log(obj, "objjjjjjjjjjjjjj");
+    setEditPost(null);
+    fetch(`https://taskforum.herokuapp.com/api/post/${postId}`, {
+      method: "PUT",
+      headers: {
+        "content-type": "application/json",
+        Authorization: "Bearer " + localStorage.getItem("token"),
+      },
+    })
+      .then((res) => res.json()) // or res.json()
+      .then((res) => {
+        console.log(res);
+        let update = data.map((update) => {
+          if (update._id === postId) {
+            update.title = title;
+            update.category = category;
+            update.description = description;
+          }
+          return update;
+        });
+        setData(update);
+      })
+      .catch((err) => console.log(err));
   };
   //Get All Posts
   useEffect(() => {
@@ -245,9 +271,8 @@ export const Posts = ({ data, setData }) => {
                         <Button
                           variant="outlined"
                           size="small"
-                          onClick={() => handleEditPost(post)}
+                          onClick={() => setEditPost(post._id)}
                         >
-                          {console.log(post.user, "userrerer")}
                           Edit
                         </Button>
                         <Button
@@ -261,63 +286,141 @@ export const Posts = ({ data, setData }) => {
                     ) : (
                       ""
                     )}
-                    <div style={{background: 'aliceblue',borderRadius:'20px'}}>
-                    <Link
-                      className={classes.Link}
-                      to={`/SinglePost/${post._id}`}
+                    {editPost === post._id && (
+                      <Box
+                        component="form"
+                        // noValidate
+                        // onSubmit={()=>handleEditPost(post._id)}
+                        sx={{ mt: 3 }}
+                      >
+                        <Grid container spacing={2}>
+                          <Grid item xs={6}>
+                            <TextField
+                              autoComplete="given-name"
+                              name="title"
+                              required
+                              fullWidth
+                              value={editTitle}
+                              onChange={(e) => {
+                                setEditTitle(e.target.value);
+                                console.log(e.target.value, "title");
+                              }}
+                              id="title"
+                              label="Title"
+                              autoFocus
+                            />
+                          </Grid>
+                          <Grid item xs={6}>
+                            <TextField
+                              autoComplete="given-name"
+                              name="category"
+                              // required
+                              fullWidth
+                              value={editCategory}
+                              onChange={(e) => {
+                                setEditCategory(e.target.value);
+                                console.log(e.target.value, "category");
+                              }}
+                              id="category"
+                              label="Category"
+                              autoFocus
+                            />
+                          </Grid>
+                          <Grid item xs={12}>
+                            <TextField
+                              // required
+                              fullWidth
+                              id="description"
+                              label="Description"
+                              value={editDesc}
+                              onChange={(e) => {
+                                setEditDesc(e.target.value);
+                                console.log(e.target.value, "desc");
+                              }}
+                              name="description"
+                              autoComplete="given-name"
+                            />
+                          </Grid>
+                        </Grid>
+                        <Button
+                          type="submit"
+                          fullWidth
+                          onClick={() => {
+                            handleEditPost(
+                              post._id,
+                              editTitle,
+                              editCategory,
+                              editDesc
+                            );
+                          }}
+                          variant="contained"
+                          sx={{ mt: 3, mb: 2 }}
+                        >
+                          Post
+                        </Button>
+                      </Box>
+                    )}
+                    <div
+                      style={{ background: "aliceblue", borderRadius: "20px" }}
                     >
-                      <Card className={classes.card}>
-                        <CardActionArea>
-                          <CardContent>
-                            <Typography
-                              gutterBottom
-                              variant="h5"
-                              component="h2"
-                            >
-                              {post.title}
-                            </Typography>
-                            <Typography
-                              gutterBottom
-                              variant="h6"
-                              component="h6"
-                            >
-                              Category: {post.category}
-                            </Typography>
-                            <Typography
-                              variant="body2"
-                              color="textSecondary"
-                              component="p"
-                            >
-                              {post.description}
-                            </Typography>
-                          </CardContent>
-                        </CardActionArea>
-
-                        <CardActions className={classes.cardActions}>
-                          <Box className={classes.author}>
-                            <Avatar src="https://images.pexels.com/photos/220453/pexels-photo-220453.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=750&w=1260" />
-                            <Box ml={2}>
-                              <Typography variant="subtitle2" component="p">
-                                Author: <strong>{post.user.name}</strong>
+                      {editPost !== post._id && <>
+                        <Link
+                        className={classes.Link}
+                        to={`/SinglePost/${post._id}`}
+                      >
+                        <Card className={classes.card}>
+                          <CardActionArea>
+                            <CardContent>
+                              <Typography
+                                gutterBottom
+                                variant="h5"
+                                component="h2"
+                              >
+                                {post.title}
                               </Typography>
                               <Typography
-                                variant="subtitle2"
+                                gutterBottom
+                                variant="h6"
+                                component="h6"
+                              >
+                                Category: {post.category}
+                              </Typography>
+                              <Typography
+                                variant="body2"
                                 color="textSecondary"
                                 component="p"
                               >
-                                {dt.toLocaleString()}
+                                {post.description}
                               </Typography>
+                            </CardContent>
+                          </CardActionArea>
+
+                          <CardActions className={classes.cardActions}>
+                            <Box className={classes.author}>
+                              <Avatar src="https://images.pexels.com/photos/220453/pexels-photo-220453.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=750&w=1260" />
+                              <Box ml={2}>
+                                <Typography variant="subtitle2" component="p">
+                                  Author: <strong>{post.user.name}</strong>
+                                </Typography>
+                                <Typography
+                                  variant="subtitle2"
+                                  color="textSecondary"
+                                  component="p"
+                                >
+                                  {dt.toLocaleString()}
+                                </Typography>
+                              </Box>
                             </Box>
-                          </Box>
-                        </CardActions>
-                      </Card>
-                    </Link>
-                    {/* {console.log(post._id, "post")} */}
-                    <RecentComments
-                      data={data}
-                      setData={setData}
-                      postId={post._id}
-                    />
+                          </CardActions>
+                        </Card>
+                      </Link></>}
+                     
+                      {/* {console.log(post._id, "post")} */}
+                      <RecentComments
+                        data={data}
+                        setData={setData}
+                        postId={post._id}
+                      />
                     </div>
                   </Grid>
                 );
