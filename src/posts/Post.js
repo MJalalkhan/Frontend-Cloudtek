@@ -66,9 +66,9 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-export const Posts = ({data,setData}) => {
+export const Posts = ({ data, setData }) => {
   const classes = useStyles();
-//Create Post
+  //Create Post
   const handleAddPost = (event) => {
     event.preventDefault();
     const formData = new FormData(event.currentTarget);
@@ -96,7 +96,7 @@ export const Posts = ({data,setData}) => {
         console.error("Error:", error);
       });
   };
-//Delete Post
+  //Delete Post
   const handleDeletePost = (item) => {
     fetch(`https://taskforum.herokuapp.com/api/post/${item._id}`, {
       method: "DELETE",
@@ -108,17 +108,18 @@ export const Posts = ({data,setData}) => {
       .then((res) => res.json())
       .then((res) => {
         console.log(res);
-        setData(data.filter((post)=>{
-          if(post._id === item._id){
-            return false
-          }
-        return true
-        }))
-        
+        setData(
+          data.filter((post) => {
+            if (post._id === item._id) {
+              return false;
+            }
+            return true;
+          })
+        );
       })
       .catch((err) => console.log(err));
   };
-//Edit Post
+  //Edit Post
   const handleEditPost = (post) => {
     console.log("post Details :", post);
     //  fetch(`https://taskforum.herokuapp.com/api/post/${id}`, {
@@ -132,29 +133,26 @@ export const Posts = ({data,setData}) => {
     //    .then((res) => console.log(res))
     //    .catch((err) => console.log(err));
   };
-//Get All Posts
-  useEffect(
-    () => {
-      fetch("https://taskforum.herokuapp.com/api/post/", {
-        method: "Get",
-        headers: {
-          "content-type": "application/json",
-          Authorization: "Bearer " + localStorage.getItem("token"),
-        },
-      })
-        .then((response) => response.json())
-        .then((res) => {
-          setData(res.data);
-          console.log("All Posts:", res);
+  //Get All Posts
+  useEffect(() => {
+    fetch("https://taskforum.herokuapp.com/api/post/", {
+      method: "Get",
+      headers: {
+        "content-type": "application/json",
+        Authorization: "Bearer " + localStorage.getItem("token"),
+      },
+    })
+      .then((response) => response.json())
+      .then((res) => {
+        setData(res.data);
+        console.log("All Posts:", res);
 
-          return;
-        })
-        .catch((error) => {
-          console.error("Error:", error);
-        });
-    },[setData]
-    
-  );
+        return;
+      })
+      .catch((error) => {
+        console.error("Error:", error);
+      });
+  }, [setData]);
   return (
     <div className="App">
       <Header />
@@ -231,81 +229,99 @@ export const Posts = ({data,setData}) => {
           Posts
         </Typography>
         <Grid container spacing={3}>
-          {data.length!==0 &&
-          data.map((post, index) => {
-            var dt = new Date(post.user.created_at);
-            return (
-              <Grid item xs={12} key={index} style={{ margin: "10px" }}>
-                {(typeof (post.user) == "object" && post.user._id === localStorage.getItem("userId")) || ((typeof (post.user) == "string" && post.user) === (localStorage.getItem("userId"))) ? (
-                  // return(
-                  <>
-                    <Button
-                      variant="outlined"
-                      size="small"
-                      onClick={() => handleEditPost(post)}
-                    >
-                      {console.log(post.user,'userrerer')}
-                      Edit
-                    </Button>
-                    <Button
-                      variant="outlined"
-                      size="small"
-                      onClick={() => handleDeletePost(post)}
-                    >
-                      Delete{" "}
-                    </Button>
-                  </>
-                )
-              :
-            ''
-          }
-                <Link className={classes.Link} to={`/SinglePost/${post._id}`}>
-                  <Card className={classes.card}>
-                    <CardActionArea>
-                      <CardContent>
-                        <Typography gutterBottom variant="h5" component="h2">
-                          {post.title}
-                        </Typography>
-                        <Typography gutterBottom variant="h6" component="h6">
-                          Category: {post.category}
-                        </Typography>
-                        <Typography
-                          variant="body2"
-                          color="textSecondary"
-                          component="p"
+          {data.length !== 0 &&
+            data
+              // .sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
+              .map((post, index) => {
+                var dt = new Date(post.user.created_at);
+                return (
+                  <Grid item xs={12} key={index} style={{ margin: "10px" }}>
+                    {(typeof post.user == "object" &&
+                      post.user._id === localStorage.getItem("userId")) ||
+                    (typeof post.user == "string" && post.user) ===
+                      localStorage.getItem("userId") ? (
+                      // return(
+                      <>
+                        <Button
+                          variant="outlined"
+                          size="small"
+                          onClick={() => handleEditPost(post)}
                         >
-                          {post.description}
-                        </Typography>
-                      </CardContent>
-                    </CardActionArea>
+                          {console.log(post.user, "userrerer")}
+                          Edit
+                        </Button>
+                        <Button
+                          variant="outlined"
+                          size="small"
+                          onClick={() => handleDeletePost(post)}
+                        >
+                          Delete{" "}
+                        </Button>
+                      </>
+                    ) : (
+                      ""
+                    )}
+                    <div style={{background: 'aliceblue',borderRadius:'20px'}}>
+                    <Link
+                      className={classes.Link}
+                      to={`/SinglePost/${post._id}`}
+                    >
+                      <Card className={classes.card}>
+                        <CardActionArea>
+                          <CardContent>
+                            <Typography
+                              gutterBottom
+                              variant="h5"
+                              component="h2"
+                            >
+                              {post.title}
+                            </Typography>
+                            <Typography
+                              gutterBottom
+                              variant="h6"
+                              component="h6"
+                            >
+                              Category: {post.category}
+                            </Typography>
+                            <Typography
+                              variant="body2"
+                              color="textSecondary"
+                              component="p"
+                            >
+                              {post.description}
+                            </Typography>
+                          </CardContent>
+                        </CardActionArea>
 
-                    <CardActions className={classes.cardActions}>
-                      <Box className={classes.author}>
-                        <Avatar src="https://images.pexels.com/photos/220453/pexels-photo-220453.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=750&w=1260" />
-                        <Box ml={2}>
-                          <Typography variant="subtitle2" component="p">
-                            Author: <strong>{post.user.name}</strong>
-                          </Typography>
-                          <Typography
-                            variant="subtitle2"
-                            color="textSecondary"
-                            component="p"
-                          >
-                            {dt.toLocaleString()}
-                          </Typography>
-                        </Box>
-                      </Box>
-                    </CardActions>
-                  </Card>
-                </Link>
-                {/* {console.log(post._id, "post")} */}
-                <RecentComments data={data} setData={setData} postId={post._id}   />
-                
-                  
-                
-              </Grid>
-            );
-          })}
+                        <CardActions className={classes.cardActions}>
+                          <Box className={classes.author}>
+                            <Avatar src="https://images.pexels.com/photos/220453/pexels-photo-220453.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=750&w=1260" />
+                            <Box ml={2}>
+                              <Typography variant="subtitle2" component="p">
+                                Author: <strong>{post.user.name}</strong>
+                              </Typography>
+                              <Typography
+                                variant="subtitle2"
+                                color="textSecondary"
+                                component="p"
+                              >
+                                {dt.toLocaleString()}
+                              </Typography>
+                            </Box>
+                          </Box>
+                        </CardActions>
+                      </Card>
+                    </Link>
+                    {/* {console.log(post._id, "post")} */}
+                    <RecentComments
+                      data={data}
+                      setData={setData}
+                      postId={post._id}
+                    />
+                    </div>
+                  </Grid>
+                );
+              })}
         </Grid>
         <Box my={4} className={classes.paginationContainer}>
           {/* <Pagination count={10} /> */}

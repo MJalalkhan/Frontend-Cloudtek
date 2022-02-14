@@ -16,7 +16,6 @@ const imgLink =
   "https://images.pexels.com/photos/1681010/pexels-photo-1681010.jpeg?auto=compress&cs=tinysrgb&dpr=3&h=750&w=1260";
 
 const useStyles = makeStyles((theme) => ({
- 
   comments: {
     textAlign: "-webkit-left",
     margin: "10px 20px",
@@ -25,20 +24,18 @@ const useStyles = makeStyles((theme) => ({
     margin: "10px 20px",
     width: "-webkit-fill-available",
   },
+  Link: { textDecoration: "none" },
 }));
 
-export const RecentComments = ({ postId ,data,setData }) => {
+export const RecentComments = ({ postId, data, setData }) => {
   const classes = useStyles();
-  const [commenting, setCommenting] = useState('');
-  const [editComment, setEditComment] = useState(false);
-  const [editValue, setEditValue] = useState('');
-  
+  const [commenting, setCommenting] = useState(""); //first comment on post
+  const [editComment, setEditComment] = useState(null);
+
   const [comments, setComments] = useState([]);
   //Add Comment
   const postComment = (msg, post, user) => {
     if (!msg == "") {
-      console.log("Comment = ", msg);
-
       let obj = {
         comment: msg,
         post: post,
@@ -54,18 +51,16 @@ export const RecentComments = ({ postId ,data,setData }) => {
         },
 
         body: JSON.stringify(obj),
-      }) 
+      })
         .then((response) => response.json())
         .then((res) => {
-          console.log(res.data, "resssss");
           setComments([...comments, res.data]);
-          setData([...data])
-          setCommenting('')
+          setData([...data]);
+          setCommenting("");
         })
         .catch((error) => {
           console.error("Error:", error);
         });
-        
     } else {
       console.log("Write some text");
     }
@@ -98,44 +93,53 @@ export const RecentComments = ({ postId ,data,setData }) => {
   };
 
   //Edit Comment
-  const handleCommentEdit = (id,updateComment) => {
-    console.log(editValue,'herereer');
-    setEditComment(true);
+  const handleCommentEdit = (id, updateComment) => {
+    let obj = {
+      comment: updateComment,
+    };
     console.log("comment id :", id);
-     fetch(`https://taskforum.herokuapp.com/api/comment/${id}`, {
-       method: "PUT",
-       headers: {
-         "content-type": "application/json",
-         Authorization: "Bearer " + localStorage.getItem("token"),
-       },
-     })
-       .then((res) => res.json()) // or res.json()
-       .then((res) => console.log(res))
-       .catch((err) => console.log(err));
-  };
-  //Get Post Comments
-    
-  useEffect(() => {
-    setTimeout(() => {
-
-    fetch(`https://taskforum.herokuapp.com/api/comment/post/${postId}`, {
-      method: "Get",
+    console.log("Comment", updateComment);
+    setEditComment(null);
+    fetch(`https://taskforum.herokuapp.com/api/comment/${id}`, {
+      method: "PUT",
       headers: {
         "content-type": "application/json",
         Authorization: "Bearer " + localStorage.getItem("token"),
       },
+      body: JSON.stringify(obj),
     })
-      .then((response) => response.json())
+      .then((res) => res.json()) // or res.json()
       .then((res) => {
-        console.log(res.data, "commenmtsss");
-        setComments(res.data);
-        return;
+        let update = comments.map((update) => {
+          if (update._id === id) {
+            update.comment = updateComment;
+          }
+          return update;
+        });
+        setComments(update);
       })
-      .catch((error) => {
-        console.error("Error:", error);
-      });
-    }, 500);
+      .catch((err) => console.log(err));
+  };
+  //Get Post Comments
 
+  useEffect(() => {
+    setTimeout(() => {
+      fetch(`https://taskforum.herokuapp.com/api/comment/post/${postId}`, {
+        method: "Get",
+        headers: {
+          "content-type": "application/json",
+          Authorization: "Bearer " + localStorage.getItem("token"),
+        },
+      })
+        .then((response) => response.json())
+        .then((res) => {
+          setComments(res.data);
+          return;
+        })
+        .catch((error) => {
+          console.error("Error:", error);
+        });
+    }, 500);
   }, []);
 
   return (
@@ -153,12 +157,14 @@ export const RecentComments = ({ postId ,data,setData }) => {
 
                 return (
                   <div key={index}>
-                    {(x.user && x.user._id === localStorage.getItem("userId")) ? (
+                    {x.user && x.user._id === localStorage.getItem("userId") ? (
                       <>
                         <Button
                           variant="outlined"
                           size="small"
-                          onClick={() => handleCommentEdit(x._id)}
+                          onClick={() => {
+                            setEditComment(x._id);
+                          }}
                         >
                           Edit
                         </Button>
@@ -170,23 +176,18 @@ export const RecentComments = ({ postId ,data,setData }) => {
                           Delete{" "}
                         </Button>
                       </>
-                    )
-                  :
-                  ''}
-                    {editComment && (
-                      comments.map((edit,index)=>{
-                        if(edit._id === x._id){
-                          // console.log(edit,'eeeeeeeeeeeeeeeeeeeedit',x._id,'xxxxxxxxxxx');
-                          
-                        return(
-                        <TextField
+                    ) : (
+                      ""
+                    )}
+                    {editComment === x._id ? (
+                      <TextField
                         key={index}
                         fullWidth
                         label="Write Comment"
                         id="fullWidth"
-                        value={edit.comment}
+                        value={commenting.length > 0 ? commenting : x.comment}
                         onChange={(e) => {
-                          setEditValue(e.target.value);
+                          setCommenting(e.target.value);
                           console.log(e.target.value);
                         }}
                         InputProps={{
@@ -196,40 +197,38 @@ export const RecentComments = ({ postId ,data,setData }) => {
                                 edge="end"
                                 color="primary"
                                 onClick={() =>
-                                  handleCommentEdit(
-                                    edit._id
-                                  )
+                                  handleCommentEdit(x._id, commenting)
                                 }
                               >
                                 <ArrowForwardIosIcon />
                               </IconButton>
-                              
                             </InputAdornment>
                           ),
-                          
-                        }
-                      }
+                        }}
                       />
-                      )}else{
-                        return null
-                      }
-                      })
-                      
-                      
+                    ) : (
+                      ""
                     )}
-                    <Grid item>
-                      <Avatar alt="Remy Sharp" src={imgLink} />
-                    </Grid>
-                    <Grid item xs zeroMinWidth>
-                      <div style={{ margin: 0, textAlign: "left" }}>
-                        {x.user ? <h4>{x.user.name}</h4> : <h4>Michel</h4>}
-                      </div>
-                      <p style={{ textAlign: "left" }}>{x.comment}. </p>
-                      <p style={{ textAlign: "left", color: "gray" }}>
-                        {dt.toLocaleString()}
-                      </p>
-                    </Grid>
-                    <Divider variant="fullWidth" style={{ margin: "10px 0" }} />
+                    {editComment !== x._id && (
+                      <>
+                        <Grid item>
+                          <Avatar alt="Remy Sharp" src={imgLink} />
+                        </Grid>
+                        <Grid item xs zeroMinWidth>
+                          <div style={{ margin: 0, textAlign: "left" }}>
+                            {x.user ? <h4>{x.user.name}</h4> : <h4>Michel</h4>}
+                          </div>
+                          <p style={{ textAlign: "left" }}>{x.comment}. </p>
+                          <p style={{ textAlign: "left", color: "gray" }}>
+                            {dt.toLocaleString()}
+                          </p>
+                        </Grid>
+                        <Divider
+                          variant="fullWidth"
+                          style={{ margin: "10px 0" }}
+                        />
+                      </>
+                    )}
                   </div>
                 );
               })
@@ -241,9 +240,16 @@ export const RecentComments = ({ postId ,data,setData }) => {
             className={classes.Link}
             underline="hover"
           >
-            {"View more comments"}
+            {`${
+              comments.length <= 3
+                ? "View All Comments"
+                : `View ${
+                    comments.length > 3 ? comments.length - 3 : ""
+                  } more comments`
+            }`}
           </Link>
           <div>
+            {editComment===null &&
             <TextField
               fullWidth
               label="Write Comment"
@@ -251,7 +257,6 @@ export const RecentComments = ({ postId ,data,setData }) => {
               value={commenting}
               onChange={(e) => {
                 setCommenting(e.target.value);
-                console.log(e.target.value);
               }}
               InputProps={{
                 endAdornment: (
@@ -265,7 +270,6 @@ export const RecentComments = ({ postId ,data,setData }) => {
                           postId,
                           localStorage.getItem("userId")
                         )
-                        
                       }
                     >
                       <ArrowForwardIosIcon />
@@ -274,9 +278,10 @@ export const RecentComments = ({ postId ,data,setData }) => {
                 ),
               }}
             />
+            }
           </div>
         </div>
-            <Divider variant="fullWidth" style={{ marginTop: "20px" }} />
+        <Divider variant="fullWidth" style={{ marginTop: "20px" }} />
       </Grid>
       {/* <Divider variant="fullWidth" style={{ margin: "10px 0" }} /> */}
     </div>

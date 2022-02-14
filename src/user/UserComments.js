@@ -114,25 +114,7 @@ export const UserComments = (props) => {
               var dt = new Date(com.user.created_at);
               return (
                 <div key={index}>
-                  {com.user === localStorage.getItem("userId") && (
-                    // return(
-                    <>
-                      <Button
-                        variant="outlined"
-                        size="small"
-                        onClick={props.handleCommentEdit}
-                      >
-                        Edit
-                      </Button>
-                      <Button
-                        variant="outlined"
-                        size="small"
-                        onClick={() => props.handleDelete(com._id)}
-                      >
-                        Delete{" "}
-                      </Button>
-                    </>
-                  )}
+                  
                   <Link
                     className={classes.Link}
                     to={`/SinglePost/${com.post._id}`}
@@ -176,6 +158,25 @@ export const UserComments = (props) => {
                     </Card>
                   </Link>
                   <h3 className={classes.comments}>Comments</h3>
+                  {com.user === localStorage.getItem("userId") && (
+                    // return(
+                    <>
+                      <Button
+                        variant="outlined"
+                        size="small"
+                        onClick={props.handleCommentEdit}
+                      >
+                        Edit
+                      </Button>
+                      <Button
+                        variant="outlined"
+                        size="small"
+                        onClick={() => props.handleDelete(com._id)}
+                      >
+                        Delete{" "}
+                      </Button>
+                    </>
+                  )}
 
                   <Grid container wrap="nowrap" spacing={2} key={index}>
                     <Grid item>
